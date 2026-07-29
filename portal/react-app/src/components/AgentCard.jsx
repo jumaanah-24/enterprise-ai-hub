@@ -45,10 +45,11 @@ export default function AgentCard({ agentKey, cardData, onHealthCheck, onInfo })
       <div className={styles.actions}>
         {cfg.port
           ? <>
+              <button className={styles.btnSecondary} onClick={() => onInfo(agentKey)}>Info</button>
               <button className={styles.btnSecondary} onClick={() => window.open(`http://localhost:${cfg.port}`, '_blank')}>Open Chat</button>
               <button className={styles.btnPrimary} onClick={() => onHealthCheck(agentKey)}>Health Check</button>
             </>
-          : <button className={styles.btnSecondary} onClick={() => onInfo(cfg.name)}>Info</button>
+          : <button className={styles.btnSecondary} onClick={() => onInfo(agentKey)}>Info</button>
         }
       </div>
     </div>

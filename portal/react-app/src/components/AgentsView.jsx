@@ -1,9 +1,17 @@
+import { useState } from 'react'
 import AgentCard from './AgentCard'
+import SupplyChainDashboard from './SupplyChainDashboard'
+import BudgetDashboard from './BudgetDashboard'
+import VendorDashboard from './VendorDashboard'
+import RiskDashboard from './RiskDashboard'
+import ProcurementDashboard from './ProcurementDashboard'
+import BriefingDashboard from './BriefingDashboard'
 import styles from './AgentsView.module.css'
 
 const AGENT_KEYS = ['supply','budget','vendor','risk','procurement','briefing']
 
 export default function AgentsView({ cards, customAgents, showToast, addIncident, addActivity, appendLog, updateMetric, updateCard }) {
+  const [activeInfo, setActiveInfo] = useState(null)
   async function handleHealthCheck(agent) {
     const endpoints = {
       supply: 'http://localhost:8000/health',
@@ -33,7 +41,7 @@ export default function AgentsView({ cards, customAgents, showToast, addIncident
         {AGENT_KEYS.map(key => (
           <AgentCard key={key} agentKey={key} cardData={cards[key]}
             onHealthCheck={handleHealthCheck}
-            onInfo={(name) => showToast(`${name} runs autonomously via pipeline`, 'info')} />
+            onInfo={(key) => ['supply','budget','vendor','risk','procurement','briefing'].includes(key) ? setActiveInfo(key) : showToast(`${key} runs autonomously via pipeline`, 'info')} />
         ))}
         {customAgents.map(a => (
           <div key={a.id} className={styles.customCard}>
@@ -48,6 +56,12 @@ export default function AgentsView({ cards, customAgents, showToast, addIncident
           </div>
         ))}
       </div>
+      {activeInfo === 'supply'  && <SupplyChainDashboard onClose={() => setActiveInfo(null)} />}
+      {activeInfo === 'budget'  && <BudgetDashboard      onClose={() => setActiveInfo(null)} />}
+      {activeInfo === 'vendor'  && <VendorDashboard      onClose={() => setActiveInfo(null)} />}
+      {activeInfo === 'risk'         && <RiskDashboard         onClose={() => setActiveInfo(null)} />}
+      {activeInfo === 'procurement'  && <ProcurementDashboard  onClose={() => setActiveInfo(null)} />}
+      {activeInfo === 'briefing'     && <BriefingDashboard     onClose={() => setActiveInfo(null)} />}
     </div>
   )
 }
