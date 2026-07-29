@@ -11,6 +11,7 @@ export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
 
   if (user) { navigate('/dashboard', { replace: true }); return null }
@@ -28,8 +29,15 @@ export default function Login() {
     } else {
       const res = register(email, password, name)
       setLoading(false)
-      if (res.ok) navigate('/dashboard', { replace: true })
-      else setError(res.error)
+      if (res.ok) {
+        setTab('signin')
+        setName('')
+        setPassword('')
+        setError('')
+        setSuccess('Account created! Please sign in.')
+      } else {
+        setError(res.error)
+      }
     }
   }
 
@@ -47,8 +55,8 @@ export default function Login() {
         </div>
 
         <div className={styles.tabs}>
-          <button className={tab === 'signin' ? styles.tabActive : styles.tab} onClick={() => { setTab('signin'); setError('') }}>Sign In</button>
-          <button className={tab === 'register' ? styles.tabActive : styles.tab} onClick={() => { setTab('register'); setError('') }}>Register</button>
+          <button className={tab === 'signin' ? styles.tabActive : styles.tab} onClick={() => { setTab('signin'); setError(''); setSuccess('') }}>Sign In</button>
+          <button className={tab === 'register' ? styles.tabActive : styles.tab} onClick={() => { setTab('register'); setError(''); setSuccess('') }}>Register</button>
         </div>
 
         <form onSubmit={handleSubmit} className={styles.form}>
@@ -62,6 +70,7 @@ export default function Login() {
           <input type="email" placeholder="you@company.com" value={email} onChange={e => setEmail(e.target.value)} required autoFocus={tab === 'signin'} />
           <label>Password</label>
           <input type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required />
+          {success && <div className={styles.successMsg}>{success}</div>}
           {error && <div className={styles.error}>{error}</div>}
           <button type="submit" className={styles.btnSubmit} disabled={loading}>
             {loading ? <span className={styles.spinner} /> : null}

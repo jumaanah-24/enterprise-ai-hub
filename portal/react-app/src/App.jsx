@@ -6,7 +6,7 @@ import { AuthProvider, useAuth } from './hooks/useAuth'
 
 function PrivateRoute({ children }) {
   const { user } = useAuth()
-  return user ? children : <Navigate to="/login" replace />
+  return user ? children : <Navigate to="/" replace />
 }
 
 function AppRoutes() {

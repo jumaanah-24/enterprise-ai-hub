@@ -16,9 +16,7 @@ export function AuthProvider({ children }) {
     if (users[email]) return { ok: false, error: 'Email already registered.' }
     users[email] = { password, name }
     localStorage.setItem('ai_hub_users', JSON.stringify(users))
-    const u = { email, name }
-    sessionStorage.setItem('ai_hub_user', JSON.stringify(u))
-    setUser(u)
+    // Do NOT auto-login — user must sign in manually
     return { ok: true }
   }
 

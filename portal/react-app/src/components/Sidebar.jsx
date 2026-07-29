@@ -8,7 +8,7 @@ export default function Sidebar({ onRunPipeline, onAddAgent }) {
 
   function handleLogout() {
     logout()
-    navigate('/')
+    navigate('/', { replace: true })
   }
 
   return (
