@@ -1,0 +1,171 @@
+ENTERPRISE VENDOR & PROCUREMENT POLICY
+Version 3.2 | Effective Date: January 1, 2024
+Approved by: Chief Procurement Officer
+
+========================================
+SECTION 1: VENDOR ELIGIBILITY CRITERIA
+========================================
+
+1.1 All vendors must be registered and approved by the Procurement Department before any purchase order is issued.
+
+1.2 Vendor Eligibility Requirements:
+- Valid business registration certificate
+- Minimum 3 years of operational history
+- Annual revenue of at least $1 million USD
+- No active litigation or regulatory sanctions
+- ISO 9001 or equivalent quality certification for hardware vendors
+- SOC 2 Type II compliance for all SaaS and cloud vendors
+- GDPR compliance certification for vendors handling EU data
+
+1.3 Blacklisted Vendors: Vendors with unresolved disputes, fraud history, or two consecutive SLA breaches are placed on the blacklist and are ineligible for new contracts.
+
+1.4 Preferred Vendor Status: Vendors with 3+ years of satisfactory performance, zero SLA breaches, and competitive pricing may be granted Preferred Vendor status, entitling them to expedited approval and priority consideration.
+
+========================================
+SECTION 2: CONTRACT COMPLIANCE RULES
+========================================
+
+2.1 All contracts must be reviewed and signed by the Legal Department before execution.
+
+2.2 Contracts exceeding $100,000 USD require approval from the CFO and CEO.
+
+2.3 Contracts exceeding $500,000 USD require Board of Directors approval.
+
+2.4 Contract Duration:
+- Standard contracts: 1-3 years
+- Cloud and SaaS contracts: 1-2 years with annual review
+- Hardware contracts: up to 5 years
+
+2.5 Auto-renewal clauses must be flagged 90 days before renewal date for review.
+
+2.6 All contracts must include:
+- Clear SLA definitions with measurable KPIs
+- Penalty clauses for SLA breaches
+- Data security and confidentiality clauses
+- Termination for convenience clause (30-day notice)
+- Dispute resolution mechanism
+
+2.7 Contracts with foreign vendors must comply with applicable export control laws and require additional legal review.
+
+========================================
+SECTION 3: SLA REQUIREMENTS
+========================================
+
+3.1 Minimum SLA Standards by Category:
+
+Cloud Services:
+- Uptime: 99.9% minimum (99.99% preferred)
+- Incident response: 4 hours for critical, 8 hours for high priority
+- Data backup: Daily with 30-day retention
+- Security patches: Within 24 hours of critical CVE disclosure
+
+Software/SaaS:
+- Uptime: 99.9% minimum
+- Support response: 24 hours standard, 4 hours for critical
+- Data export capability required
+
+Hardware:
+- Replacement SLA: 48 hours for critical equipment
+- On-site support: Next business day
+- Warranty: Minimum 3 years
+
+Logistics:
+- On-time delivery: 98% minimum
+- Damage rate: Less than 0.5%
+- Tracking: Real-time visibility required
+
+3.2 SLA Breach Penalties:
+- First breach: Written warning + service credit
+- Second breach: 10% contract value penalty
+- Third breach: Contract termination rights activated
+
+3.3 SLA reporting must be submitted monthly by the vendor.
+
+========================================
+SECTION 4: PAYMENT TERMS
+========================================
+
+4.1 Standard Payment Terms:
+- Net-30: Standard for software and services
+- Net-45: Standard for consulting and professional services
+- Net-60: Standard for hardware and large equipment
+- Net-15: For logistics and time-sensitive services
+
+4.2 Early Payment Discounts:
+- 2/10 Net-30: 2% discount if paid within 10 days
+- 1/15 Net-45: 1% discount if paid within 15 days
+
+4.3 Late Payment Penalties:
+- 1.5% per month on overdue balances
+- Vendors may suspend services after 60 days of non-payment
+
+4.4 Purchase Orders above $10,000 require three competitive quotes.
+Purchase Orders above $50,000 require formal RFP process.
+Purchase Orders above $200,000 require competitive bidding with minimum 3 vendors.
+
+4.5 Advance payments are not permitted without CFO approval.
+
+4.6 All payments must be processed through the approved ERP system (Oracle).
+
+========================================
+SECTION 5: DATA SECURITY & COMPLIANCE
+========================================
+
+5.1 All vendors with access to company data must sign a Data Processing Agreement (DPA).
+
+5.2 Cloud vendors must provide:
+- SOC 2 Type II report annually
+- Penetration test results annually
+- Data residency confirmation (data must remain in approved regions)
+
+5.3 Vendors must notify the company within 24 hours of any data breach.
+
+5.4 Annual vendor security assessments are mandatory for contracts exceeding $50,000.
+
+5.5 Vendors must comply with:
+- GDPR (for EU data)
+- CCPA (for California resident data)
+- ISO 27001 (preferred for all technology vendors)
+
+========================================
+SECTION 6: VENDOR PERFORMANCE REVIEW
+========================================
+
+6.1 Quarterly performance reviews are conducted for all active contracts above $25,000.
+
+6.2 Annual reviews are conducted for all active contracts.
+
+6.3 Performance Scorecard (100 points):
+- SLA compliance: 40 points
+- Quality of deliverables: 25 points
+- Responsiveness and communication: 20 points
+- Pricing competitiveness: 15 points
+
+6.4 Vendors scoring below 60 are placed on a Performance Improvement Plan (PIP).
+Vendors scoring below 40 are subject to contract termination.
+
+6.5 Vendors scoring above 85 for two consecutive years qualify for Preferred Vendor status.
+
+========================================
+SECTION 7: CONTRACT RENEWAL & TERMINATION
+========================================
+
+7.1 Renewal Process:
+- Procurement team initiates review 90 days before expiry
+- Legal review required for any modified terms
+- CFO approval required for contracts above $100,000
+
+7.2 Termination for Cause:
+- Immediate termination for fraud, data breach, or criminal activity
+- 30-day notice for repeated SLA breaches (3 or more)
+- 60-day notice for performance issues
+
+7.3 Termination for Convenience:
+- 30-day written notice required
+- No penalty if notice period is honored
+- Vendor must provide transition assistance for 60 days post-termination
+
+7.4 Upon termination, vendors must:
+- Return all company data within 30 days
+- Provide data in portable format
+- Certify data deletion in writing

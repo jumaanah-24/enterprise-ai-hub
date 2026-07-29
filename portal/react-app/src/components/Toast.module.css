@@ -1,0 +1,16 @@
+.toast {
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-md);
+  font-size: .82rem;
+  animation: slideIn .3s ease;
+}
+@keyframes slideIn {
+  from { transform: translateX(100px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+.success { border-left: 3px solid var(--accent-green); }
+.error   { border-left: 3px solid var(--accent-red); }
+.info    { border-left: 3px solid var(--accent-blue); }

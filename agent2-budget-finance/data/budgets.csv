@@ -1,0 +1,11 @@
+department,allocated_budget,spent_budget,fiscal_year,category
+Engineering,500000,387000,2024,Technology
+Marketing,200000,198500,2024,Operations
+HR,150000,112000,2024,Operations
+Finance,100000,94000,2024,Operations
+Sales,300000,276000,2024,Revenue
+IT Infrastructure,250000,231000,2024,Technology
+Legal,80000,61000,2024,Compliance
+Operations,180000,175000,2024,Operations
+R&D,400000,289000,2024,Technology
+Customer Support,120000,118500,2024,Operations

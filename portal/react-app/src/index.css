@@ -1,0 +1,49 @@
+:root {
+  --bg-primary: #0b0e14;
+  --bg-secondary: #131820;
+  --bg-card: #1a212c;
+  --bg-card-hover: #1f2836;
+  --bg-inset: #0f141c;
+  --border: #262f3e;
+  --border-light: #323e52;
+  --text-primary: #e8edf5;
+  --text-secondary: #8b98b0;
+  --text-muted: #5a6a7e;
+  --accent-blue: #3b82f6;
+  --accent-cyan: #06b6d4;
+  --accent-green: #22c55e;
+  --accent-orange: #f59e0b;
+  --accent-red: #ef4444;
+  --accent-purple: #a855f7;
+  --accent-pink: #ec4899;
+  --gradient-1: linear-gradient(135deg, #3b82f6, #06b6d4);
+  --gradient-2: linear-gradient(135deg, #22c55e, #06b6d4);
+  --gradient-3: linear-gradient(135deg, #f59e0b, #ec4899);
+  --gradient-4: linear-gradient(135deg, #a855f7, #3b82f6);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.4);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,.5);
+  --shadow-glow-blue: 0 0 20px rgba(59,130,246,.15);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+  --transition: 200ms cubic-bezier(.4,0,.2,1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 14px; scroll-behavior: smooth; }
+body {
+  font-family: var(--font);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+::selection { background: rgba(59,130,246,.35); color: #fff; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+

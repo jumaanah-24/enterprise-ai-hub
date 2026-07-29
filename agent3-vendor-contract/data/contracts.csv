@@ -1,0 +1,16 @@
+contract_id,vendor,department,start_date,end_date,value,payment_terms,sla_uptime,sla_response_hours,penalty_clause,status,category,auto_renew
+C001,AWS,IT Infrastructure,2023-01-01,2025-12-31,540000,Net-30,99.99,4,2% per hour downtime,active,Cloud,true
+C002,Microsoft Azure,IT Infrastructure,2023-06-01,2025-05-31,228000,Net-30,99.95,8,1% per hour downtime,active,Cloud,true
+C003,Salesforce,Sales,2023-03-01,2024-02-28,36000,Net-45,99.9,24,Service credit 10%,expired,CRM,false
+C004,Dell Technologies,IT Infrastructure,2024-01-01,2026-12-31,150000,Net-60,99.5,48,Replacement within 5 days,active,Hardware,false
+C005,Adobe Systems,Marketing,2023-07-01,2024-06-30,12000,Net-30,99.9,24,Service credit 5%,expired,Software,true
+C006,Workday,HR,2023-09-01,2025-08-31,36000,Net-45,99.95,12,Service credit 15%,active,HRMS,true
+C007,FedEx,Operations,2024-01-01,2024-12-31,88000,Net-15,98.0,72,Penalty 5% per late delivery,active,Logistics,false
+C008,Cisco Systems,IT Infrastructure,2023-11-01,2026-10-31,192000,Net-60,99.9,24,Hardware replacement 48h,active,Networking,false
+C009,Oracle,Finance,2024-02-01,2027-01-31,168000,Net-45,99.95,8,Service credit 20%,active,ERP,true
+C010,Zendesk,Customer Support,2024-01-01,2025-12-31,28000,Net-30,99.9,12,Service credit 10%,active,Support,true
+C011,GitHub,Engineering,2023-04-01,2024-03-31,8000,Net-30,99.95,4,Service credit 5%,expired,DevTools,true
+C012,LexisNexis,Legal,2024-01-01,2025-12-31,19000,Net-45,99.5,48,N/A,active,Legal,false
+C013,NVIDIA,R&D,2024-03-01,2025-02-28,240000,Net-60,99.0,72,Replacement within 10 days,active,Hardware,false
+C014,Google Cloud,IT Infrastructure,2024-01-01,2025-12-31,132000,Net-30,99.99,4,2% per hour downtime,active,Cloud,true
+C015,Slack,Engineering,2023-05-01,2024-04-30,15000,Net-30,99.99,1,Service credit 25%,expired,Communication,true

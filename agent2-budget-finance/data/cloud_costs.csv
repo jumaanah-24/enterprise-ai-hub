@@ -1,0 +1,7 @@
+month,aws_cost,azure_cost,gcp_cost,total_cost,budget_limit,department
+2024-01,42000,18000,9000,69000,75000,IT Infrastructure
+2024-02,45000,19500,9800,74300,75000,IT Infrastructure
+2024-03,51000,21000,10200,82200,75000,IT Infrastructure
+2024-04,48000,20000,9500,77500,75000,IT Infrastructure
+2024-05,53000,22500,11000,86500,75000,IT Infrastructure
+2024-06,49000,19000,9200,77200,75000,IT Infrastructure

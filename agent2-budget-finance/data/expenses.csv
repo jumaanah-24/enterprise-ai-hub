@@ -1,0 +1,16 @@
+expense_id,department,employee,category,amount,date,approved,description
+E001,Sales,John Smith,Travel,3200,2024-01-10,true,Client visit NYC
+E002,Engineering,Alice Chen,Training,1500,2024-01-15,true,AWS Certification
+E003,Marketing,Bob Lee,Events,8500,2024-01-20,true,Trade Show Booth
+E004,HR,Carol White,Recruitment,4200,2024-02-01,true,Job Fair
+E005,Engineering,David Kim,Software,950,2024-02-05,true,Dev Tools License
+E006,Sales,Emma Davis,Travel,5100,2024-02-10,true,Europe Sales Trip
+E007,R&D,Frank Zhang,Equipment,12000,2024-02-15,true,Lab Supplies
+E008,Marketing,Grace Liu,Advertising,22000,2024-03-01,true,Digital Campaign
+E009,Operations,Henry Brown,Logistics,3800,2024-03-05,true,Warehouse Supplies
+E010,Engineering,Iris Park,Conference,2200,2024-03-10,true,AWS re:Invent
+E011,Finance,Jack Wilson,Audit,6500,2024-03-15,true,External Audit Fee
+E012,Legal,Karen Moore,Legal,4800,2024-03-20,true,Contract Review
+E013,Sales,Liam Taylor,Entertainment,1200,2024-04-01,false,Client Dinner
+E014,IT Infrastructure,Mia Anderson,Hardware,890,2024-04-05,true,Cables and Accessories
+E015,Customer Support,Noah Thomas,Training,1800,2024-04-10,true,Support Certification

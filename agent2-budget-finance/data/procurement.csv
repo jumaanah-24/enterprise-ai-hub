@@ -1,0 +1,16 @@
+purchase_id,department,vendor,item,amount,date,status,category
+P001,Engineering,AWS,Cloud Servers,45000,2024-01-15,approved,Cloud
+P002,Marketing,Adobe,Creative Suite,12000,2024-01-20,approved,Software
+P003,HR,Workday,HRMS License,18000,2024-02-01,approved,Software
+P004,IT Infrastructure,Dell,Laptops x50,75000,2024-02-10,approved,Hardware
+P005,R&D,NVIDIA,GPU Cluster,120000,2024-02-15,pending,Hardware
+P006,Sales,Salesforce,CRM License,36000,2024-03-01,approved,Software
+P007,Engineering,GitHub,Enterprise License,8000,2024-03-05,approved,Software
+P008,Operations,FedEx,Logistics Contract,22000,2024-03-10,approved,Logistics
+P009,Marketing,Google,Ad Campaign,55000,2024-03-15,approved,Marketing
+P010,Legal,LexisNexis,Legal Research,9500,2024-03-20,approved,Software
+P011,IT Infrastructure,Cisco,Network Equipment,48000,2024-04-01,approved,Hardware
+P012,Engineering,Azure,Cloud Storage,31000,2024-04-05,approved,Cloud
+P013,Customer Support,Zendesk,Support Platform,14000,2024-04-10,approved,Software
+P014,R&D,Lab Equipment Co,Lab Instruments,67000,2024-04-15,approved,Equipment
+P015,Finance,Oracle,ERP License,42000,2024-04-20,pending,Software

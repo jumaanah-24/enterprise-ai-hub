@@ -1,0 +1,1870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Enterprise AI Hub · CrewAI Control Center</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ── CSS Variables (dark-first) ── */
+    :root {
+      --bg-primary: #0b0e14;
+      --bg-secondary: #131820;
+      --bg-card: #1a212c;
+      --bg-card-hover: #1f2836;
+      --bg-inset: #0f141c;
+      --border: #262f3e;
+      --border-light: #323e52;
+      --text-primary: #e8edf5;
+      --text-secondary: #8b98b0;
+      --text-muted: #5a6a7e;
+      --accent-blue: #3b82f6;
+      --accent-cyan: #06b6d4;
+      --accent-green: #22c55e;
+      --accent-orange: #f59e0b;
+      --accent-red: #ef4444;
+      --accent-purple: #a855f7;
+      --accent-pink: #ec4899;
+      --gradient-1: linear-gradient(135deg, #3b82f6, #06b6d4);
+      --gradient-2: linear-gradient(135deg, #22c55e, #06b6d4);
+      --gradient-3: linear-gradient(135deg, #f59e0b, #ec4899);
+      --gradient-4: linear-gradient(135deg, #a855f7, #3b82f6);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.3);
+      --shadow-md: 0 4px 12px rgba(0,0,0,.4);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,.5);
+      --shadow-glow-blue: 0 0 20px rgba(59,130,246,.15);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 20px;
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --transition: 200ms cubic-bezier(.4,0,.2,1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { font-size: 14px; scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+    ::selection { background: rgba(59,130,246,.35); color: #fff; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ── Layout ── */
+    .app { display: flex; min-height: 100vh; }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 260px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 50;
+    }
+    .sidebar-header {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-header .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -.02em;
+    }
+    .sidebar-header .logo svg { width: 28px; height: 28px; }
+    .sidebar-header .logo span { background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .sidebar-header .subtitle {
+      font-size: .7rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .sidebar-nav { flex: 1; padding: 12px; }
+    .sidebar-nav .nav-section { margin-bottom: 20px; }
+    .sidebar-nav .nav-label {
+      font-size: .65rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--text-muted);
+      padding: 0 8px;
+      margin-bottom: 6px;
+    }
+    .sidebar-nav .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: .82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+    .sidebar-nav .nav-item:hover { background: var(--bg-card); color: var(--text-primary); }
+    .sidebar-nav .nav-item.active { background: rgba(59,130,246,.12); color: var(--accent-blue); }
+    .sidebar-nav .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; opacity: .7; }
+    .sidebar-nav .nav-item.active svg { opacity: 1; }
+    .sidebar-footer {
+      padding: 12px;
+      border-top: 1px solid var(--border);
+      font-size: .7rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+    .sidebar-footer .status-dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+
+    /* ── Main Content ── */
+    .main-content {
+      flex: 1;
+      padding: 24px 32px;
+      max-width: 1440px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* ── Top Bar ── */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+    }
+    .topbar h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -.03em;
+    }
+    .topbar h1 span { background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .topbar .actions { display: flex; gap: 10px; align-items: center; }
+    .topbar .badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 4px 14px 4px 10px;
+      font-size: .75rem;
+      font-weight: 500;
+    }
+    .topbar .badge .dot {
+      width: 7px; height: 7px; border-radius: 50%;
+    }
+    .topbar .badge .dot.green { background: var(--accent-green); }
+    .topbar .badge .dot.yellow { background: var(--accent-orange); }
+
+    /* ── Hero / Friendly Overview ── */
+    .hero-section {
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 18px;
+      background: linear-gradient(135deg, rgba(59,130,246,.16), rgba(6,182,212,.08));
+      border: 1px solid rgba(59,130,246,.18);
+      border-radius: 24px;
+      padding: 24px;
+      margin-bottom: 22px;
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+      position: relative;
+    }
+    .hero-section::after {
+      content: '';
+      position: absolute;
+      inset: auto -40px -40px auto;
+      width: 180px;
+      height: 180px;
+      background: radial-gradient(circle, rgba(59,130,246,.22), transparent 70%);
+      pointer-events: none;
+    }
+    .hero-copy { position: relative; z-index: 1; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      color: var(--accent-cyan);
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .hero-copy h2 {
+      font-size: 1.8rem;
+      line-height: 1.2;
+      margin-bottom: 10px;
+      font-weight: 700;
+      letter-spacing: -.03em;
+    }
+    .hero-copy p {
+      color: var(--text-secondary);
+      font-size: .96rem;
+      max-width: 620px;
+      margin-bottom: 16px;
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+    .hero-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .hero-chip {
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: var(--text-secondary);
+      font-size: .74rem;
+      font-weight: 500;
+    }
+    .hero-visual {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 260px;
+    }
+    .hero-image-wrapper {
+      position: relative;
+      width: 240px;
+      max-width: 100%;
+      border-radius: 32px;
+      padding: 18px;
+      background: rgba(12,20,36,.9);
+      box-shadow: 0 24px 60px rgba(5,24,65,.22);
+      border: 1px solid rgba(255,255,255,.08);
+      overflow: hidden;
+      animation: float-robot 3.2s ease-in-out infinite;
+    }
+    .hero-image-wrapper::before {
+      content: '';
+      position: absolute;
+      inset: -40px auto auto -40px;
+      width: 180px;
+      height: 180px;
+      background: radial-gradient(circle, rgba(59,130,246,.18), transparent 66%);
+      filter: blur(12px);
+      z-index: 0;
+    }
+    .hero-robot-image {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 24px;
+      position: relative;
+      z-index: 1;
+      transform-origin: center center;
+      animation: float-robot 3.2s ease-in-out infinite;
+    }
+    @keyframes float-robot {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+    .hero-glow-ring {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 180px;
+      height: 30px;
+      border-radius: 999px;
+      background: rgba(14,165,233,.12);
+      filter: blur(8px);
+      z-index: 0;
+    }
+    .hero-tag {
+      position: absolute;
+      top: 18px;
+      right: 16px;
+      padding: 6px 10px;
+      background: rgba(14,165,233,.12);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 999px;
+      font-size: .72rem;
+      color: #8fd8ff;
+      z-index: 2;
+      backdrop-filter: blur(8px);
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .info-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+    .info-card .info-title {
+      font-size: .8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+    .info-card p {
+      color: var(--text-secondary);
+      font-size: .84rem;
+      line-height: 1.5;
+    }
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    @keyframes blink {
+      0%, 100% { transform: scaleY(1); }
+      50% { transform: scaleY(0.16); }
+    }
+    @keyframes wave {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(12deg); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: .5; transform: scale(1); }
+      50% { opacity: .9; transform: scale(1.04); }
+    }
+
+    /* ── KPI Strip ── */
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      transition: var(--transition);
+    }
+    .kpi-card:hover {
+      border-color: var(--border-light);
+      box-shadow: var(--shadow-sm);
+    }
+    .kpi-card .label {
+      font-size: .7rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .kpi-card .value {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -.03em;
+    }
+    .kpi-card .change {
+      font-size: .75rem;
+      margin-top: 2px;
+      font-weight: 500;
+    }
+    .kpi-card .change.up { color: var(--accent-green); }
+    .kpi-card .change.down { color: var(--accent-red); }
+
+    /* ── Agent Cards ── */
+    .section-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title .count {
+      font-size: .7rem;
+      background: var(--bg-card);
+      color: var(--text-muted);
+      padding: 1px 8px;
+      border-radius: 100px;
+      font-weight: 500;
+    }
+    .agent-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .agent-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .agent-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 3px;
+    }
+    .agent-card[data-agent="supply"]::before     { background: var(--gradient-1); }
+    .agent-card[data-agent="budget"]::before     { background: var(--gradient-2); }
+    .agent-card[data-agent="vendor"]::before     { background: var(--gradient-4); }
+    .agent-card[data-agent="risk"]::before       { background: var(--gradient-3); }
+    .agent-card[data-agent="procurement"]::before{ background: linear-gradient(135deg,#06b6d4,#22c55e); }
+    .agent-card[data-agent="briefing"]::before   { background: linear-gradient(135deg,#ec4899,#a855f7); }
+    .agent-card:hover {
+      border-color: var(--border-light);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+    .agent-card .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .agent-card .card-avatar {
+      width: 40px; height: 40px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    .agent-card[data-agent="supply"] .card-avatar      { background: rgba(59,130,246,.15);  color: var(--accent-blue); }
+    .agent-card[data-agent="budget"] .card-avatar      { background: rgba(34,197,94,.15);   color: var(--accent-green); }
+    .agent-card[data-agent="vendor"] .card-avatar      { background: rgba(168,85,247,.15);  color: var(--accent-purple); }
+    .agent-card[data-agent="risk"] .card-avatar        { background: rgba(245,158,11,.15);  color: var(--accent-orange); }
+    .agent-card[data-agent="procurement"] .card-avatar { background: rgba(6,182,212,.15);   color: var(--accent-cyan); }
+    .agent-card[data-agent="briefing"] .card-avatar    { background: rgba(236,72,153,.15);  color: var(--accent-pink); }
+    .agent-card .card-name {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    .agent-card .card-status {
+      font-size: .68rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 1px;
+    }
+    .agent-card .card-status .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      display: inline-block;
+    }
+    .agent-card .card-status .dot.online { background: var(--accent-green); }
+    .agent-card .card-status .dot.warning { background: var(--accent-orange); }
+    .agent-card .card-status .dot.offline { background: var(--accent-red); }
+    .agent-card .card-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .agent-card .card-metric {
+      background: var(--bg-inset);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+    }
+    .agent-card .card-metric .m-label {
+      font-size: .65rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--text-muted);
+    }
+    .agent-card .card-metric .m-value {
+      font-size: .9rem;
+      font-weight: 600;
+      margin-top: 1px;
+    }
+    .agent-card .card-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font);
+      font-size: .78rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      border: 1px solid transparent;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--accent-blue);
+      color: #fff;
+      border-color: var(--accent-blue);
+    }
+    .btn-primary:hover { background: #2563eb; box-shadow: var(--shadow-glow-blue); }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-secondary);
+      border-color: var(--border);
+    }
+    .btn-secondary:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+    .btn-sm { padding: 5px 12px; font-size: .72rem; }
+
+    /* ── CrewAI Dashboard ── */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } }
+
+    .dashboard-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+    }
+    .dashboard-panel .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .dashboard-panel .panel-title {
+      font-size: .85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dashboard-panel .panel-title svg { width: 16px; height: 16px; opacity: .7; }
+    .dashboard-panel .panel-badge {
+      font-size: .68rem;
+      background: var(--bg-inset);
+      color: var(--text-muted);
+      padding: 2px 10px;
+      border-radius: 100px;
+    }
+
+    /* ── Incident Feed ── */
+    .incident-feed { list-style: none; }
+    .incident-feed li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .incident-feed li:last-child { border-bottom: none; }
+    .incident-feed .i-icon {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: .75rem;
+    }
+    .incident-feed .i-icon.error { background: rgba(239,68,68,.15); color: var(--accent-red); }
+    .incident-feed .i-icon.warn { background: rgba(245,158,11,.15); color: var(--accent-orange); }
+    .incident-feed .i-icon.info { background: rgba(59,130,246,.15); color: var(--accent-blue); }
+    .incident-feed .i-icon.success { background: rgba(34,197,94,.15); color: var(--accent-green); }
+    .incident-feed .i-text { flex: 1; font-size: .82rem; }
+    .incident-feed .i-text strong { font-weight: 600; }
+    .incident-feed .i-time {
+      font-size: .68rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .incident-feed .i-detail {
+      font-size: .75rem;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    /* ── Pipeline View ── */
+    .pipeline-steps {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      flex-wrap: wrap;
+      row-gap: 6px;
+    }
+    .pipeline-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-inset);
+      font-size: .75rem;
+      font-weight: 500;
+    }
+    .pipeline-step .step-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+    }
+    .pipeline-step .step-dot.done { background: var(--accent-green); }
+    .pipeline-step .step-dot.running { background: var(--accent-blue); animation: pulse 1.5s infinite; }
+    .pipeline-step .step-dot.pending { background: var(--border); }
+    .pipeline-step .step-dot.failed { background: var(--accent-red); }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: .4; }
+    }
+    .pipeline-arrow {
+      color: var(--text-muted);
+      font-size: .9rem;
+      margin: 0 4px;
+    }
+
+    /* ── Console Log ── */
+    .console-log {
+      background: var(--bg-inset);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      font-family: var(--mono);
+      font-size: .72rem;
+      line-height: 1.6;
+      max-height: 200px;
+      overflow-y: auto;
+      color: var(--text-secondary);
+    }
+    .console-log .cl-line { white-space: pre-wrap; word-break: break-all; }
+    .console-log .cl-line .cl-time { color: var(--text-muted); }
+    .console-log .cl-line .cl-info { color: var(--accent-cyan); }
+    .console-log .cl-line .cl-ok { color: var(--accent-green); }
+    .console-log .cl-line .cl-err { color: var(--accent-red); }
+    .console-log .cl-line .cl-warn { color: var(--accent-orange); }
+
+    /* ── Metrics Table ── */
+    .metrics-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .8rem;
+    }
+    .metrics-table th {
+      text-align: left;
+      padding: 8px 10px;
+      font-weight: 500;
+      color: var(--text-muted);
+      font-size: .68rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      border-bottom: 1px solid var(--border);
+    }
+    .metrics-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .metrics-table tr:last-child td { border-bottom: none; }
+    .metrics-table .metric-bar {
+      height: 4px;
+      border-radius: 2px;
+      background: var(--border);
+      max-width: 100px;
+      position: relative;
+      overflow: hidden;
+    }
+    .metrics-table .metric-bar .fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width .6s ease;
+    }
+    .metrics-table .metric-bar .fill.good { background: var(--accent-green); }
+    .metrics-table .metric-bar .fill.warn { background: var(--accent-orange); }
+    .metrics-table .metric-bar .fill.bad { background: var(--accent-red); }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.6);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .modal {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      max-width: 540px;
+      width: 90vw;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+    }
+    .modal h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; }
+    .modal .modal-close {
+      float: right;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.3rem;
+      cursor: pointer;
+    }
+    .modal label {
+      display: block;
+      font-size: .78rem;
+      font-weight: 500;
+      margin-bottom: 4px;
+      color: var(--text-secondary);
+    }
+    .modal input, .modal textarea, .modal select {
+      width: 100%;
+      padding: 8px 12px;
+      background: var(--bg-inset);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-family: var(--font);
+      font-size: .85rem;
+      margin-bottom: 12px;
+      outline: none;
+    }
+    .modal input:focus, .modal textarea:focus, .modal select:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 2px rgba(59,130,246,.2);
+    }
+    .modal textarea { resize: vertical; min-height: 60px; }
+    .modal .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
+
+    /* ── Toast ── */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .toast {
+      padding: 10px 16px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      box-shadow: var(--shadow-md);
+      font-size: .82rem;
+      animation: slideIn .3s ease;
+    }
+    @keyframes slideIn {
+      from { transform: translateX(100px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    .toast.success { border-left: 3px solid var(--accent-green); }
+    .toast.error { border-left: 3px solid var(--accent-red); }
+    .toast.info { border-left: 3px solid var(--accent-blue); }
+
+    /* ── Run Button ── */
+    .btn-run {
+      background: var(--gradient-1);
+      color: #fff;
+      border: none;
+      padding: 8px 20px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font);
+      font-size: .82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .btn-run:hover { box-shadow: var(--shadow-glow-blue); transform: translateY(-1px); }
+    .btn-run:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    .btn-run .spinner {
+      display: inline-block;
+      width: 12px; height: 12px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Last-run result strip ── */
+    .result-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .result-chip {
+      background: var(--bg-inset);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+    }
+    .result-chip .rc-label {
+      font-size: .62rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--text-muted);
+      margin-bottom: 3px;
+    }
+    .result-chip .rc-value {
+      font-size: .82rem;
+      font-weight: 600;
+      word-break: break-all;
+    }
+    .rc-value.ok   { color: var(--accent-green); }
+    .rc-value.warn { color: var(--accent-orange); }
+    .rc-value.bad  { color: var(--accent-red); }
+
+    /* ── Responsive ── */
+    @media (max-width: 720px) {
+      .sidebar { display: none; }
+      .main-content { padding: 16px; }
+      .agent-grid { grid-template-columns: 1fr; }
+      .kpi-strip { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- ═══ Sidebar ═══ -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <svg viewBox="0 0 28 28" fill="none">
+            <rect x="2" y="2" width="24" height="24" rx="6" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M8 12l4 4 8-8" stroke="url(#lg)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs><linearGradient id="lg" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#3b82f6"/><stop offset="1" stop-color="#06b6d4"/></linearGradient></defs>
+          </svg>
+          <span>AI Hub</span>
+        </div>
+        <div class="subtitle">CrewAI Control Center</div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-label">Overview</div>
+          <button class="nav-item active" data-section="dashboard" onclick="switchSection('dashboard')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            Dashboard
+          </button>
+          <button class="nav-item" data-section="agents" onclick="switchSection('agents')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Agents
+          </button>
+          <button class="nav-item" data-section="incidents" onclick="switchSection('incidents')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Incidents
+          </button>
+        </div>
+        <div class="nav-section">
+          <div class="nav-label">Actions</div>
+          <button class="nav-item" onclick="runCrewPipeline()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Run Crew Pipeline
+          </button>
+          <button class="nav-item" onclick="openAddAgentModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Agent
+          </button>
+        </div>
+        <div class="nav-section">
+          <div class="nav-label">Resources</div>
+          <button class="nav-item" onclick="window.open('https://docs.crewai.com','_blank')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            CrewAI Docs
+          </button>
+          <button class="nav-item" onclick="window.open('https://github.com/joaomdmoura/crewAI','_blank')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            GitHub
+          </button>
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <span class="status-dot"></span> All systems operational
+      </div>
+    </aside>
+
+    <!-- ═══ Main ═══ -->
+    <main class="main-content" id="mainContent">
+      <!-- Top Bar -->
+      <div class="topbar">
+        <h1><span>Enterprise</span> AI Control Center</h1>
+        <div class="actions">
+          <div class="badge">
+            <span class="dot green"></span>
+            <span id="crewStatusText">Crew Ready</span>
+          </div>
+          <button class="btn-run" id="runPipelineBtn" onclick="runCrewPipeline()">
+            ▶ Run Pipeline
+          </button>
+        </div>
+      </div>
+
+      <div class="hero-section">
+        <div class="hero-copy">
+          <div class="eyebrow">Friendly AI operations workspace</div>
+          <h2>Your digital team helps the business stay calm, informed, and ready.</h2>
+          <p>This control center turns complex agent activity into simple, clear updates so anyone can understand what is happening and why.</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" onclick="runCrewPipeline()">Run a workflow</button>
+            <button class="btn btn-secondary" onclick="switchSection('agents')">See the agents</button>
+          </div>
+          <div class="hero-chips">
+            <span class="hero-chip">Supply chain insight</span>
+            <span class="hero-chip">Budget monitoring</span>
+            <span class="hero-chip">Vendor support</span>
+            <span class="hero-chip">Executive summaries</span>
+          </div>
+        </div>
+        <div class="hero-visual" aria-hidden="true">
+          <div class="hero-image-wrapper">
+            <span class="hero-tag">AI Guide</span>
+            <img class="hero-robot-image" src="/static/robot.png" alt="Enterprise AI robot" />
+            <div class="hero-glow-ring"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-title">🧭 Plain-English updates</div>
+          <p>Each agent explains its work in simple terms so teams can understand the situation fast.</p>
+        </div>
+        <div class="info-card">
+          <div class="info-title">⚡ Faster decisions</div>
+          <p>Key signals are gathered from different domains and presented in one place.</p>
+        </div>
+        <div class="info-card">
+          <div class="info-title">🤝 Better collaboration</div>
+          <p>Operations, finance, procurement, and leadership can all stay aligned with one view.</p>
+        </div>
+      </div>
+
+      <!-- ═══ Section: Dashboard (default) ═══ -->
+      <div id="section-dashboard" class="section-view">
+        <!-- KPI Strip -->
+        <div class="kpi-strip" id="kpiStrip">
+          <div class="kpi-card">
+            <div class="label">Total Incidents</div>
+            <div class="value" id="kpiIncidents">0</div>
+            <div class="change up" id="kpiIncidentsChange">▲ 0%</div>
+          </div>
+          <div class="kpi-card">
+            <div class="label">Active Agents</div>
+            <div class="value" id="kpiAgents">6</div>
+            <div class="change up">▲ All Online</div>
+          </div>
+          <div class="kpi-card">
+            <div class="label">Avg Response Time</div>
+            <div class="value" id="kpiResponse">0ms</div>
+            <div class="change up" id="kpiResponseChange">▲ 0%</div>
+          </div>
+          <div class="kpi-card">
+            <div class="label">Pipeline Runs</div>
+            <div class="value" id="kpiRuns">0</div>
+            <div class="change up" id="kpiRunsChange">▲ 0</div>
+          </div>
+          <div class="kpi-card">
+            <div class="label">Uptime</div>
+            <div class="value" id="kpiUptime">99.9%</div>
+            <div class="change up">▲ Stable</div>
+          </div>
+        </div>
+
+        <!-- Agent Cards -->
+        <div class="section-title">Your AI Team <span class="count" id="agentCount">6</span></div>
+        <div class="agent-grid" id="agentGrid">
+          <!-- Agent 1 -->
+          <div class="agent-card" data-agent="supply">
+            <div class="card-header">
+              <div class="card-avatar">📦</div>
+              <div>
+                <div class="card-name">Inventory &amp; Logistics Assistant</div>
+                <div class="card-status"><span class="dot online"></span> Online · <span id="supplyLastRun">—</span></div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="card-metric"><div class="m-label">Stock view</div><div class="m-value" id="supplyInventory">—</div></div>
+              <div class="card-metric"><div class="m-label">Open orders</div><div class="m-value" id="supplyOrders">—</div></div>
+              <div class="card-metric"><div class="m-label">Coverage</div><div class="m-value" id="supplyStock">—</div></div>
+              <div class="card-metric"><div class="m-label">Risk signal</div><div class="m-value" id="supplyAlerts">0</div></div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-secondary btn-sm" onclick="window.open('http://localhost:8000','_blank')">Open Chat</button>
+              <button class="btn btn-primary btn-sm" onclick="runAgentTask('supply')">Health Check</button>
+            </div>
+          </div>
+
+          <!-- Agent 2 -->
+          <div class="agent-card" data-agent="budget">
+            <div class="card-header">
+              <div class="card-avatar">💰</div>
+              <div>
+                <div class="card-name">Spend &amp; Budget Assistant</div>
+                <div class="card-status"><span class="dot online"></span> Online · <span id="budgetLastRun">—</span></div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="card-metric"><div class="m-label">Spend used</div><div class="m-value" id="budgetUsed">—</div></div>
+              <div class="card-metric"><div class="m-label">Recommendation</div><div class="m-value" id="budgetForecast">—</div></div>
+              <div class="card-metric"><div class="m-label">Gap</div><div class="m-value" id="budgetVariance">—</div></div>
+              <div class="card-metric"><div class="m-label">Remaining</div><div class="m-value" id="budgetSavings">—</div></div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-secondary btn-sm" onclick="window.open('http://localhost:8001','_blank')">Open Chat</button>
+              <button class="btn btn-primary btn-sm" onclick="runAgentTask('budget')">Health Check</button>
+            </div>
+          </div>
+
+          <!-- Agent 3 -->
+          <div class="agent-card" data-agent="vendor">
+            <div class="card-header">
+              <div class="card-avatar">📋</div>
+              <div>
+                <div class="card-name">Vendor &amp; Contract Assistant</div>
+                <div class="card-status"><span class="dot online"></span> Online · <span id="vendorLastRun">—</span></div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="card-metric"><div class="m-label">Partner</div><div class="m-value" id="vendorCount">—</div></div>
+              <div class="card-metric"><div class="m-label">Contract status</div><div class="m-value" id="vendorContracts">—</div></div>
+              <div class="card-metric"><div class="m-label">Compliance</div><div class="m-value" id="vendorCompliance">—</div></div>
+              <div class="card-metric"><div class="m-label">Expires soon</div><div class="m-value" id="vendorExpiring">0</div></div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-secondary btn-sm" onclick="window.open('http://localhost:8002','_blank')">Open Chat</button>
+              <button class="btn btn-primary btn-sm" onclick="runAgentTask('vendor')">Health Check</button>
+            </div>
+          </div>
+
+          <!-- Agent 4 -->
+          <div class="agent-card" data-agent="risk">
+            <div class="card-header">
+              <div class="card-avatar">⚠️</div>
+              <div>
+                <div class="card-name">Risk &amp; Forecasting Assistant</div>
+                <div class="card-status"><span class="dot online"></span> Autonomous · <span id="riskLastRun">—</span></div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="card-metric"><div class="m-label">Overall risk</div><div class="m-value" id="riskLevel">—</div></div>
+              <div class="card-metric"><div class="m-label">Risk score</div><div class="m-value" id="riskScore">—</div></div>
+              <div class="card-metric"><div class="m-label">Best backup</div><div class="m-value" id="riskSupplier">—</div></div>
+              <div class="card-metric"><div class="m-label">Expected delay</div><div class="m-value" id="riskDelay">—</div></div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-secondary btn-sm" onclick="showToast('Agent 4 runs autonomously via pipeline','info')">Info</button>
+              <button class="btn btn-primary btn-sm" onclick="runAgentTask('orchestrator')">Ping Orchestrator</button>
+            </div>
+          </div>
+
+          <!-- Agent 5 -->
+          <div class="agent-card" data-agent="procurement">
+            <div class="card-header">
+              <div class="card-avatar">🛒</div>
+              <div>
+                <div class="card-name">Procurement &amp; Workflow Assistant</div>
+                <div class="card-status"><span class="dot online"></span> Autonomous · <span id="procLastRun">—</span></div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="card-metric"><div class="m-label">Latest PO</div><div class="m-value" id="procPO">—</div></div>
+              <div class="card-metric"><div class="m-label">Approval</div><div class="m-value" id="procApproval">—</div></div>
+              <div class="card-metric"><div class="m-label">ERP update</div><div class="m-value" id="procERP">—</div></div>
+              <div class="card-metric"><div class="m-label">Execution</div><div class="m-value" id="procStatus">—</div></div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-secondary btn-sm" onclick="showToast('Agent 5 runs autonomously via pipeline','info')">Info</button>
+            </div>
+          </div>
+
+          <!-- Agent 6 -->
+          <div class="agent-card" data-agent="briefing">
+            <div class="card-header">
+              <div class="card-avatar">📊</div>
+              <div>
+                <div class="card-name">Executive Briefing Assistant</div>
+                <div class="card-status"><span class="dot online"></span> Autonomous · <span id="briefLastRun">—</span></div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="card-metric"><div class="m-label">Latest report</div><div class="m-value" id="briefReport">—</div></div>
+              <div class="card-metric"><div class="m-label">Dashboard</div><div class="m-value" id="briefDashboard">—</div></div>
+              <div class="card-metric"><div class="m-label">Slack</div><div class="m-value" id="briefSlack">—</div></div>
+              <div class="card-metric"><div class="m-label">WhatsApp</div><div class="m-value" id="briefWA">—</div></div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-secondary btn-sm" onclick="showToast('Agent 6 runs autonomously via pipeline','info')">Info</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CrewAI Dashboard -->
+        <div class="section-title">What is happening right now</div>
+        <div class="dashboard-grid">
+          <!-- Incident Feed -->
+          <div class="dashboard-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                Live updates
+              </div>
+              <span class="panel-badge" id="incidentCountBadge">0 incidents</span>
+            </div>
+            <ul class="incident-feed" id="incidentFeed">
+              <li>
+                <div class="i-icon info">ℹ</div>
+                <div class="i-text">
+                  <strong>CrewAI Monitor</strong> — System initialized. Waiting for pipeline execution.
+                  <div class="i-detail">Portal ready · 6 agents registered</div>
+                </div>
+                <span class="i-time">now</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Pipeline Status -->
+          <div class="dashboard-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                Workstream flow
+              </div>
+              <span class="panel-badge" id="pipelineStatusBadge">Idle</span>
+            </div>
+            <div class="pipeline-steps" id="pipelineSteps">
+              <div class="pipeline-step" data-step="1"><span class="step-dot pending"></span> Supply Chain</div>
+              <span class="pipeline-arrow">→</span>
+              <div class="pipeline-step" data-step="2"><span class="step-dot pending"></span> Budget</div>
+              <span class="pipeline-arrow">→</span>
+              <div class="pipeline-step" data-step="3"><span class="step-dot pending"></span> Vendor</div>
+              <span class="pipeline-arrow">→</span>
+              <div class="pipeline-step" data-step="4"><span class="step-dot pending"></span> Risk</div>
+              <span class="pipeline-arrow">→</span>
+              <div class="pipeline-step" data-step="5"><span class="step-dot pending"></span> Procurement</div>
+              <span class="pipeline-arrow">→</span>
+              <div class="pipeline-step" data-step="6"><span class="step-dot pending"></span> Briefing</div>
+            </div>
+            <div style="margin-top: 12px;">
+              <div class="console-log" id="consoleLog">
+                <div class="cl-line"><span class="cl-time">[init]</span> <span class="cl-info">CrewAI orchestrator loaded</span></div>
+                <div class="cl-line"><span class="cl-time">[init]</span> <span class="cl-info">6 agents registered in crew</span></div>
+                <div class="cl-line"><span class="cl-time">[ready]</span> <span class="cl-ok">Pipeline ready — click "Run Pipeline"</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Agent Metrics Table -->
+          <div class="dashboard-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                How each assistant is performing
+              </div>
+              <span class="panel-badge">Last 24h</span>
+            </div>
+            <table class="metrics-table">
+              <thead>
+                <tr>
+                  <th>Agent</th>
+                  <th>Tasks</th>
+                  <th>Success Rate</th>
+                  <th>Avg Time</th>
+                  <th>Load</th>
+                </tr>
+              </thead>
+              <tbody id="metricsBody">
+                <tr>
+                  <td>Supply Chain</td>
+                  <td id="mSupplyTasks">0</td>
+                  <td id="mSupplySuccess">—</td>
+                  <td id="mSupplyTime">—</td>
+                  <td><div class="metric-bar"><div class="fill good" id="mSupplyBar" style="width:0%"></div></div></td>
+                </tr>
+                <tr>
+                  <td>Budget &amp; Finance</td>
+                  <td id="mBudgetTasks">0</td>
+                  <td id="mBudgetSuccess">—</td>
+                  <td id="mBudgetTime">—</td>
+                  <td><div class="metric-bar"><div class="fill good" id="mBudgetBar" style="width:0%"></div></div></td>
+                </tr>
+                <tr>
+                  <td>Vendor &amp; Contract</td>
+                  <td id="mVendorTasks">0</td>
+                  <td id="mVendorSuccess">—</td>
+                  <td id="mVendorTime">—</td>
+                  <td><div class="metric-bar"><div class="fill good" id="mVendorBar" style="width:0%"></div></div></td>
+                </tr>
+                <tr>
+                  <td>Risk &amp; Forecast</td>
+                  <td id="mRiskTasks">0</td>
+                  <td id="mRiskSuccess">—</td>
+                  <td id="mRiskTime">—</td>
+                  <td><div class="metric-bar"><div class="fill good" id="mRiskBar" style="width:0%"></div></div></td>
+                </tr>
+                <tr>
+                  <td>Procurement</td>
+                  <td id="mProcTasks">0</td>
+                  <td id="mProcSuccess">—</td>
+                  <td id="mProcTime">—</td>
+                  <td><div class="metric-bar"><div class="fill good" id="mProcBar" style="width:0%"></div></div></td>
+                </tr>
+                <tr>
+                  <td>Exec. Briefing</td>
+                  <td id="mBriefTasks">0</td>
+                  <td id="mBriefSuccess">—</td>
+                  <td id="mBriefTime">—</td>
+                  <td><div class="metric-bar"><div class="fill good" id="mBriefBar" style="width:0%"></div></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Recent Activity -->
+          <div class="dashboard-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Recent Activity
+              </div>
+              <span class="panel-badge" id="activityCount">0 events</span>
+            </div>
+            <ul class="incident-feed" id="activityFeed">
+              <li>
+                <div class="i-icon info">ℹ</div>
+                <div class="i-text">
+                  <strong>Portal</strong> — Dashboard initialized
+                  <div class="i-detail">Enterprise AI Hub v1.0</div>
+                </div>
+                <span class="i-time">now</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ Section: Agents (hidden by default) ═══ -->
+      <div id="section-agents" class="section-view" style="display:none;">
+        <div class="section-title">All Agents <span class="count">6</span></div>
+        <div class="agent-grid" id="agentGridFull"></div>
+      </div>
+
+      <!-- ═══ Section: Incidents (hidden by default) ═══ -->
+      <div id="section-incidents" class="section-view" style="display:none;">
+        <div class="section-title">Incident History <span class="count" id="incidentHistoryCount">0</span></div>
+        <div class="dashboard-panel">
+          <ul class="incident-feed" id="incidentHistoryList">
+            <li>
+              <div class="i-icon info">ℹ</div>
+              <div class="i-text">
+                <strong>No incidents recorded</strong>
+                <div class="i-detail">All agents operating normally</div>
+              </div>
+              <span class="i-time">—</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ═══ Modal Overlay ═══ -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <h2 id="modalTitle">Agent Details</h2>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- ═══ Add Agent Modal ═══ -->
+  <div class="modal-overlay" id="addAgentOverlay">
+    <div class="modal">
+      <button class="modal-close" onclick="closeAddAgentModal()">&times;</button>
+      <h2>Register New Agent</h2>
+      <form id="addAgentForm" onsubmit="addAgent(event)">
+        <label for="agentName">Agent Name</label>
+        <input type="text" id="agentName" placeholder="e.g. HR Agent" required />
+        <label for="agentRole">Role</label>
+        <input type="text" id="agentRole" placeholder="e.g. Human Resources Specialist" />
+        <label for="agentGoal">Goal</label>
+        <textarea id="agentGoal" placeholder="Describe the agent's primary objective..."></textarea>
+        <label for="agentEndpoint">API Endpoint (optional)</label>
+        <input type="url" id="agentEndpoint" placeholder="http://localhost:8000/agent" />
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeAddAgentModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Register Agent</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══ Toast Container ═══ -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    // ── State ──
+    const state = {
+      incidents: [],
+      activities: [],
+      pipelineRunning: false,
+      pipelineRuns: 0,
+      agentMetrics: {
+        supply:      { tasks: 0, success: 0, time: 0, load: 0 },
+        budget:      { tasks: 0, success: 0, time: 0, load: 0 },
+        vendor:      { tasks: 0, success: 0, time: 0, load: 0 },
+        risk:        { tasks: 0, success: 0, time: 0, load: 0 },
+        procurement: { tasks: 0, success: 0, time: 0, load: 0 },
+        briefing:    { tasks: 0, success: 0, time: 0, load: 0 }
+      },
+      customAgents: []
+    };
+
+    // ── Section Switching ──
+    function switchSection(section) {
+      document.querySelectorAll('.section-view').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      document.querySelector(`[data-section="${section}"]`)?.classList.add('active');
+      const target = document.getElementById(`section-${section}`);
+      if (target) target.style.display = 'block';
+    }
+
+    // ── Toast ──
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => { toast.remove(); }, 4000);
+    }
+
+    // ── Add Incident ──
+    function addIncident(type, title, detail) {
+      const time = new Date().toLocaleTimeString();
+      state.incidents.unshift({ type, title, detail, time });
+      renderIncidents();
+      updateKPIs();
+    }
+
+    function addActivity(title, detail) {
+      const time = new Date().toLocaleTimeString();
+      state.activities.unshift({ title, detail, time });
+      renderActivities();
+    }
+
+    function renderIncidents() {
+      const feed = document.getElementById('incidentFeed');
+      const badge = document.getElementById('incidentCountBadge');
+      const historyList = document.getElementById('incidentHistoryList');
+      const historyCount = document.getElementById('incidentHistoryCount');
+
+      const icons = { error: '✕', warn: '⚠', info: 'ℹ', success: '✓' };
+      const items = state.incidents.map(i => `
+        <li>
+          <div class="i-icon ${i.type}">${icons[i.type] || 'ℹ'}</div>
+          <div class="i-text">
+            <strong>${i.title}</strong>
+            ${i.detail ? `<div class="i-detail">${i.detail}</div>` : ''}
+          </div>
+          <span class="i-time">${i.time}</span>
+        </li>
+      `).join('');
+
+      feed.innerHTML = items || `<li><div class="i-icon info">ℹ</div><div class="i-text"><strong>CrewAI Monitor</strong> — No incidents<div class="i-detail">All clear</div></div><span class="i-time">—</span></li>`;
+      historyList.innerHTML = items || `<li><div class="i-icon info">ℹ</div><div class="i-text"><strong>No incidents recorded</strong><div class="i-detail">All agents operating normally</div></div><span class="i-time">—</span></li>`;
+      badge.textContent = `${state.incidents.length} incident${state.incidents.length !== 1 ? 's' : ''}`;
+      historyCount.textContent = state.incidents.length;
+    }
+
+    function renderActivities() {
+      const feed = document.getElementById('activityFeed');
+      const count = document.getElementById('activityCount');
+      const icons = { error: '✕', warn: '⚠', info: 'ℹ', success: '✓' };
+      const items = state.activities.map(a => `
+        <li>
+          <div class="i-icon info">ℹ</div>
+          <div class="i-text">
+            <strong>${a.title}</strong>
+            ${a.detail ? `<div class="i-detail">${a.detail}</div>` : ''}
+          </div>
+          <span class="i-time">${a.time}</span>
+        </li>
+      `).join('');
+      feed.innerHTML = items || `<li><div class="i-icon info">ℹ</div><div class="i-text"><strong>Portal</strong> — Dashboard initialized<div class="i-detail">Enterprise AI Hub v1.0</div></div><span class="i-time">now</span></li>`;
+      count.textContent = `${state.activities.length} event${state.activities.length !== 1 ? 's' : ''}`;
+    }
+
+    function updateKPIs() {
+      document.getElementById('kpiIncidents').textContent = state.incidents.length;
+      document.getElementById('kpiRuns').textContent = state.pipelineRuns;
+    }
+
+    // ── Console Log ──
+    function appendLog(message, level = 'info') {
+      const log = document.getElementById('consoleLog');
+      const time = new Date().toLocaleTimeString();
+      const cls = level === 'ok' ? 'cl-ok' : level === 'err' ? 'cl-err' : level === 'warn' ? 'cl-warn' : 'cl-info';
+      const line = document.createElement('div');
+      line.className = 'cl-line';
+      line.innerHTML = `<span class="cl-time">[${time}]</span> <span class="${cls}">${message}</span>`;
+      log.appendChild(line);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    // ── Update Agent Metrics ──
+    function _metricRow(key, taskId, successId, timeId, barId) {
+      const m = state.agentMetrics[key];
+      document.getElementById(taskId).textContent = m.tasks;
+      document.getElementById(successId).textContent = m.tasks > 0 ? Math.round((m.success / m.tasks) * 100) + '%' : '—';
+      document.getElementById(timeId).textContent = m.time ? m.time + 'ms' : '—';
+      const bar = document.getElementById(barId);
+      bar.style.width = m.load + '%';
+      bar.className = 'fill ' + (m.load > 80 ? 'bad' : m.load > 50 ? 'warn' : 'good');
+    }
+    function updateAgentMetricsUI() {
+      _metricRow('supply',      'mSupplyTasks', 'mSupplySuccess', 'mSupplyTime', 'mSupplyBar');
+      _metricRow('budget',      'mBudgetTasks', 'mBudgetSuccess', 'mBudgetTime', 'mBudgetBar');
+      _metricRow('vendor',      'mVendorTasks', 'mVendorSuccess', 'mVendorTime', 'mVendorBar');
+      _metricRow('risk',        'mRiskTasks',   'mRiskSuccess',   'mRiskTime',   'mRiskBar');
+      _metricRow('procurement', 'mProcTasks',   'mProcSuccess',   'mProcTime',   'mProcBar');
+      _metricRow('briefing',    'mBriefTasks',  'mBriefSuccess',  'mBriefTime',  'mBriefBar');
+    }
+
+    // ── Update Agent Card Data ──
+    function updateAgentCard(agent, data) {
+      const setEl = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.textContent = val; };
+      if (agent === 'supply') {
+        setEl('supplyInventory', data.inventory); setEl('supplyOrders', data.orders);
+        setEl('supplyStock', data.stock); setEl('supplyAlerts', data.alerts);
+        setEl('supplyLastRun', data.lastRun);
+      } else if (agent === 'budget') {
+        setEl('budgetUsed', data.budgetUsed); setEl('budgetForecast', data.forecast);
+        setEl('budgetVariance', data.variance); setEl('budgetSavings', data.savings);
+        setEl('budgetLastRun', data.lastRun);
+      } else if (agent === 'vendor') {
+        setEl('vendorCount', data.vendors); setEl('vendorContracts', data.contracts);
+        setEl('vendorCompliance', data.compliance); setEl('vendorExpiring', data.expiring);
+        setEl('vendorLastRun', data.lastRun);
+      } else if (agent === 'risk') {
+        setEl('riskLevel', data.riskLevel); setEl('riskScore', data.riskScore);
+        setEl('riskSupplier', data.supplier); setEl('riskDelay', data.delay);
+        setEl('riskLastRun', data.lastRun);
+      } else if (agent === 'procurement') {
+        setEl('procPO', data.po); setEl('procApproval', data.approval);
+        setEl('procERP', data.erp); setEl('procStatus', data.status);
+        setEl('procLastRun', data.lastRun);
+      } else if (agent === 'briefing') {
+        setEl('briefReport', data.report); setEl('briefDashboard', data.dashboard);
+        setEl('briefSlack', data.slack); setEl('briefWA', data.wa);
+        setEl('briefLastRun', data.lastRun);
+      }
+    }
+
+    async function runAgentTask(agent) {
+      const agentNames = {
+        supply: 'Supply Chain', budget: 'Budget & Finance', vendor: 'Vendor & Contract',
+        orchestrator: 'Orchestrator'
+      };
+      const endpoints = {
+        supply: 'http://localhost:8000/health',
+        budget: 'http://localhost:8001/health',
+        vendor: 'http://localhost:8002/health',
+        orchestrator: 'http://localhost:8003/health'
+      };
+      const name = agentNames[agent] || agent;
+      showToast(`Checking ${name}...`, 'info');
+      appendLog(`Health check: ${name}...`, 'info');
+      try {
+        const resp = await fetch(endpoints[agent]);
+        const result = await resp.json();
+        showToast(`✅ ${name} is online`, 'success');
+        appendLog(`✓ ${name}: ${JSON.stringify(result)}`, 'ok');
+        if (state.agentMetrics[agent]) {
+          state.agentMetrics[agent].tasks++;
+          state.agentMetrics[agent].success++;
+          state.agentMetrics[agent].time = Math.floor(Math.random() * 200 + 50);
+          state.agentMetrics[agent].load = Math.min(100, state.agentMetrics[agent].load + 5);
+          updateAgentMetricsUI();
+        }
+        updateAgentCard(agent, { lastRun: new Date().toLocaleTimeString() });
+        addActivity(`${name} health check`, 'Agent is online and responding');
+      } catch (err) {
+        showToast(`❌ ${name} is offline`, 'error');
+        appendLog(`✕ ${name} unreachable: ${err.message}`, 'err');
+        addIncident('error', `${name} Agent`, `Offline: ${err.message}`);
+      }
+    }
+
+    // ── Run Crew Pipeline ──
+    async function runCrewPipeline() {
+      if (state.pipelineRunning) return;
+
+      // Show incident input modal
+      document.getElementById('modalTitle').textContent = '🚀 Run CrewAI Pipeline';
+      document.getElementById('modalBody').innerHTML = `
+        <p style="color:var(--text-secondary);margin-bottom:16px;font-size:.85rem;">Enter incident details to trigger the full 6-agent autonomous pipeline.</p>
+        <label>Incident ID</label>
+        <input type="text" id="pipelineIncidentId" value="INC001" />
+        <label>SKU</label>
+        <input type="text" id="pipelineSku" value="SKU2" />
+        <label>Required Quantity</label>
+        <input type="number" id="pipelineQty" value="88" />
+        <div class="form-actions">
+          <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="submitPipeline()">▶ Run Pipeline</button>
+        </div>
+      `;
+      document.getElementById('modalOverlay').classList.add('open');
+    }
+
+    async function submitPipeline() {
+      const incident_id = document.getElementById('pipelineIncidentId').value || 'INC001';
+      const sku = document.getElementById('pipelineSku').value || 'SKU2';
+      const required_quantity = parseInt(document.getElementById('pipelineQty').value) || 88;
+      closeModal();
+
+      state.pipelineRunning = true;
+      const btn = document.getElementById('runPipelineBtn');
+      const statusBadge = document.getElementById('pipelineStatusBadge');
+      const crewStatus = document.getElementById('crewStatusText');
+      const steps = document.querySelectorAll('.pipeline-step .step-dot');
+      // 6 steps: supply(0) budget(1) vendor(2) risk(3) procurement(4) briefing(5)
+      const agentStepMap = { 'Agent 1': 0, 'Agent 2': 1, 'Agent 3': 2, 'Agent 4': 3, 'Agent 5': 4, 'Agent 6': 5 };
+      const agentKeyMap  = { 'Agent 1': 'supply', 'Agent 2': 'budget', 'Agent 3': 'vendor',
+                             'Agent 4': 'risk', 'Agent 5': 'procurement', 'Agent 6': 'briefing' };
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Running...';
+      statusBadge.textContent = 'Running';
+      crewStatus.textContent = 'Pipeline Active';
+      document.querySelector('.topbar .badge .dot').className = 'dot yellow';
+      steps.forEach(s => s.className = 'step-dot pending');
+
+      appendLog(`=== CrewAI Pipeline Started: ${incident_id} ===`, 'info');
+      appendLog(`SKU=${sku}  Qty=${required_quantity}`, 'info');
+      addActivity('CrewAI Pipeline', `Incident ${incident_id} triggered`);
+      addIncident('info', `Incident ${incident_id}`, `SKU=${sku}, Qty=${required_quantity}`);
+
+      try {
+        // POST to orchestrator
+        const resp = await fetch('http://localhost:8003/run-incident', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ incident_id, sku, required_quantity })
+        });
+
+        if (!resp.ok) throw new Error(`Orchestrator error: ${resp.status}`);
+        const { run_id } = await resp.json();
+        appendLog(`Run ID: ${run_id}`, 'info');
+
+        // Stream logs via SSE
+        const evtSource = new EventSource(`http://localhost:8003/stream/${run_id}`);
+
+        evtSource.onmessage = (e) => {
+          const data = JSON.parse(e.data);
+
+          if (data.done) {
+            evtSource.close();
+            // mark last step done
+            steps[5].className = 'step-dot done';
+            state.pipelineRuns++;
+            updateKPIs();
+            btn.disabled = false;
+            btn.innerHTML = '▶ Run Pipeline';
+            statusBadge.textContent = data.status === 'completed' ? 'Completed ✓' : 'Failed ✕';
+            crewStatus.textContent = 'Crew Ready';
+            document.querySelector('.topbar .badge .dot').className = 'dot green';
+            state.pipelineRunning = false;
+
+            if (data.status === 'completed') {
+              showToast('✅ All 6 agents completed!', 'success');
+              appendLog('=== Pipeline Finished Successfully ===', 'ok');
+              addIncident('success', `Pipeline ${incident_id}`, 'All 6 agents completed');
+              fetch(`http://localhost:8003/result/${run_id}`)
+                .then(r => r.json())
+                .then(result => showResult(result))
+                .catch(err => appendLog(`Failed to fetch result: ${err.message}`, 'err'));
+            } else {
+              showToast('❌ Pipeline failed. Check logs.', 'error');
+              appendLog('=== Pipeline Failed ===', 'err');
+              addIncident('error', `Pipeline ${incident_id}`, 'Pipeline execution failed');
+            }
+            return;
+          }
+
+          if (data.error) { appendLog(`Error: ${data.error}`, 'err'); return; }
+
+          // Update pipeline step dots
+          const stepIdx = agentStepMap[data.agent];
+          if (stepIdx !== undefined) {
+            if (data.kind === 'done') {
+              steps[stepIdx].className = 'step-dot done';
+            } else if (data.kind === 'agent' || data.kind === 'tool') {
+              // only set running if not already done
+              if (!steps[stepIdx].classList.contains('done')) {
+                steps[stepIdx].className = 'step-dot running';
+              }
+            }
+          }
+
+          // Log to console
+          const level = data.kind === 'done' ? 'ok' : data.kind === 'error' ? 'err' : data.kind === 'output' ? 'warn' : 'info';
+          appendLog(`[${data.agent}] ${data.msg}`, level);
+
+          // Update agent metrics on completion (1-3 only; 4-6 handled in showResult)
+          if (data.kind === 'done') {
+            const agentKey = agentKeyMap[data.agent];
+            if (agentKey && state.agentMetrics[agentKey] && ['supply','budget','vendor'].includes(agentKey)) {
+              state.agentMetrics[agentKey].tasks++;
+              state.agentMetrics[agentKey].success++;
+              state.agentMetrics[agentKey].time = Math.floor(Math.random() * 600 + 100);
+              state.agentMetrics[agentKey].load = Math.min(100, state.agentMetrics[agentKey].load + 20);
+              updateAgentMetricsUI();
+            }
+          }
+        };
+
+        evtSource.onerror = () => {
+          evtSource.close();
+          appendLog('SSE stream closed', 'warn');
+        };
+
+      } catch (err) {
+        appendLog(`Pipeline error: ${err.message}`, 'err');
+        showToast(`Pipeline failed: ${err.message}`, 'error');
+        addIncident('error', 'Pipeline Error', err.message);
+        btn.disabled = false;
+        btn.innerHTML = '▶ Run Pipeline';
+        statusBadge.textContent = 'Failed';
+        crewStatus.textContent = 'Crew Ready';
+        document.querySelector('.topbar .badge .dot').className = 'dot green';
+        state.pipelineRunning = false;
+      }
+    }
+
+    function _parseAgentJson(raw) {
+      if (!raw) return {};
+      if (typeof raw === 'object') return raw;
+      try { const s = raw.indexOf('{'), e = raw.lastIndexOf('}') + 1; return s !== -1 ? JSON.parse(raw.slice(s, e)) : {}; }
+      catch { return {}; }
+    }
+
+    function showResult(result) {
+      const r  = result.result || {};
+      const a1 = _parseAgentJson(r.agent1_supply_chain);
+      const a2 = _parseAgentJson(r.agent2_budget_finance);
+      const a3 = _parseAgentJson(r.agent3_vendor_contract);
+      const a4 = r.agent4_risk_assessment || {};
+      const a5 = r.agent5_procurement     || {};
+      const a6 = r.agent6_executive_brief || {};
+      const now = new Date().toLocaleTimeString();
+
+      const el = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = (v != null && v !== '') ? v : '—'; };
+
+      // ── Agent 1 — Supply Chain ──
+      el('supplyInventory', a1.stock_levels != null ? a1.stock_levels : null);
+      el('supplyOrders',    a1.order_quantities != null ? a1.order_quantities : null);
+      el('supplyStock',     a1.shortage_quantity != null ? (a1.has_shortage ? '⚠ Short ' + a1.shortage_quantity : '✓ OK') : null);
+      el('supplyAlerts',    a1.risk_level || null);
+      el('supplyLastRun',   now);
+      const supplyAlertEl = document.getElementById('supplyAlerts');
+      if (supplyAlertEl && a1.risk_level) {
+        const c = { CRITICAL:'var(--accent-red)', HIGH:'var(--accent-orange)', MEDIUM:'var(--accent-orange)', LOW:'var(--accent-green)' };
+        supplyAlertEl.style.color = c[a1.risk_level] || '';
+      }
+
+      // ── Agent 2 — Budget & Finance ──
+      el('budgetUsed',     a2.percent_used != null ? a2.percent_used + '%' : null);
+      el('budgetForecast', a2.verdict || null);
+      el('budgetVariance', a2.shortfall != null ? (a2.shortfall > 0 ? '-$' + a2.shortfall.toLocaleString() : '✓ OK') : null);
+      el('budgetSavings',  a2.remaining_budget != null ? '$' + Math.round(a2.remaining_budget).toLocaleString() : null);
+      el('budgetLastRun',  now);
+      const budgetForecastEl = document.getElementById('budgetForecast');
+      if (budgetForecastEl && a2.verdict) {
+        budgetForecastEl.style.color = a2.verdict === 'APPROVED' ? 'var(--accent-green)' : 'var(--accent-red)';
+      }
+
+      // ── Agent 3 — Vendor & Contract ──
+      el('vendorCount',      a3.vendor_name || null);
+      el('vendorContracts',  a3.contract_status || null);
+      el('vendorCompliance', a3.compliant != null ? (a3.compliant ? '✓ Compliant' : '✗ Issues') : null);
+      el('vendorExpiring',   a3.days_until_expiry != null ? a3.days_until_expiry + 'd' : null);
+      el('vendorLastRun',    now);
+      const vendorCompEl = document.getElementById('vendorCompliance');
+      if (vendorCompEl && a3.compliant != null) {
+        vendorCompEl.style.color = a3.compliant ? 'var(--accent-green)' : 'var(--accent-red)';
+      }
+
+      // ── Agent 4 — Risk & Forecasting ──
+      el('riskLevel',    a4.overall_risk);
+      el('riskScore',    a4.risk_score != null ? a4.risk_score + '/100' : null);
+      el('riskSupplier', a4.recommended_supplier);
+      el('riskDelay',    a4.expected_delay != null ? a4.expected_delay + 'd' : null);
+      el('riskLastRun',  now);
+      const rlEl = document.getElementById('riskLevel');
+      if (rlEl && a4.overall_risk) {
+        const c = { CRITICAL:'var(--accent-red)', HIGH:'var(--accent-orange)', MEDIUM:'var(--accent-orange)', LOW:'var(--accent-green)' };
+        rlEl.style.color = c[a4.overall_risk] || '';
+      }
+
+      // ── Agent 5 — Procurement ──
+      el('procPO',       a5.purchase_order_id);
+      el('procApproval', a5.approval_status);
+      el('procERP',      a5.execution_status === 'SUCCESS' ? 'CREATED' : a5.execution_status);
+      el('procStatus',   a5.execution_status);
+      el('procLastRun',  now);
+      const procStatusEl = document.getElementById('procStatus');
+      if (procStatusEl && a5.execution_status) {
+        procStatusEl.style.color = a5.execution_status === 'SUCCESS' ? 'var(--accent-green)' : 'var(--accent-red)';
+      }
+
+      // ── Agent 6 — Executive Briefing ──
+      el('briefReport',    a6.report_file);
+      el('briefDashboard', a6.dashboard_status);
+      el('briefSlack',     a6.slack_payload    ? '✅ Sent' : '—');
+      el('briefWA',        a6.whatsapp_payload ? '✅ Sent' : '—');
+      el('briefLastRun',   now);
+
+      // ── metrics table — all 6 agents ──
+      ['supply','budget','vendor','risk','procurement','briefing'].forEach(k => {
+        state.agentMetrics[k].tasks++;
+        state.agentMetrics[k].success++;
+        state.agentMetrics[k].time = Math.floor(Math.random() * 600 + 100);
+        state.agentMetrics[k].load = Math.min(100, state.agentMetrics[k].load + 20);
+      });
+      updateAgentMetricsUI();
+    }
+
+    // ── Modal ──
+    function openAgentModal(name, agent) {
+      document.getElementById('modalTitle').textContent = name;
+      const endpoints = {
+        supply: 'http://localhost:8000/health',
+        budget: 'http://localhost:8001/health',
+        vendor: 'http://localhost:8002/health'
+      };
+      const body = document.getElementById('modalBody');
+      body.innerHTML = `<p style="color:var(--text-muted)">Loading agent details...</p>`;
+      document.getElementById('modalOverlay').classList.add('open');
+
+      fetch(endpoints[agent])
+        .then(r => r.json())
+        .then(data => {
+          body.innerHTML = `<pre style="font-family:var(--mono);font-size:.78rem;color:var(--text-secondary);white-space:pre-wrap;background:var(--bg-inset);padding:12px;border-radius:var(--radius-sm);">${JSON.stringify(data, null, 2)}</pre>`;
+        })
+        .catch(() => {
+          body.innerHTML = `<p style="color:var(--text-muted)">Agent status endpoint unavailable. Check if the agent server is running.</p>`;
+        });
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('open');
+    }
+
+    // ── Add Agent Modal ──
+    function openAddAgentModal() {
+      document.getElementById('addAgentOverlay').classList.add('open');
+    }
+
+    function closeAddAgentModal() {
+      document.getElementById('addAgentOverlay').classList.remove('open');
+    }
+
+    function addAgent(event) {
+      event.preventDefault();
+      const name = document.getElementById('agentName').value;
+      const role = document.getElementById('agentRole').value || 'Custom Agent';
+      const goal = document.getElementById('agentGoal').value || 'No goal specified';
+      const endpoint = document.getElementById('agentEndpoint').value || null;
+
+      const agent = {
+        id: `custom-${Date.now()}`,
+        name,
+        role,
+        goal,
+        endpoint,
+        status: 'registered',
+        added: new Date().toLocaleString()
+      };
+
+      state.customAgents.push(agent);
+      showToast(`Agent "${name}" registered successfully`, 'success');
+      addIncident('success', `New Agent: ${name}`, `Role: ${role}`);
+      addActivity(`Agent registered: ${name}`, `Role: ${role}`);
+
+      // Add to agent grid
+      const grid = document.getElementById('agentGrid');
+      const card = document.createElement('div');
+      card.className = 'agent-card';
+      card.setAttribute('data-agent', 'custom');
+      card.innerHTML = `
+        <div class="card-header">
+          <div class="card-avatar" style="background:rgba(236,72,153,.15);color:var(--accent-pink);">🤖</div>
+          <div>
+            <div class="card-name">${name}</div>
+            <div class="card-status"><span class="dot online"></span> Registered · ${role}</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-metric" style="grid-column:1/-1;"><div class="m-label">Goal</div><div class="m-value" style="font-size:.78rem;font-weight:400;">${goal}</div></div>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-secondary btn-sm" onclick="showToast('${name} details','info')">View Details</button>
+        </div>
+      `;
+      grid.appendChild(card);
+
+      document.getElementById('agentCount').textContent = 3 + state.customAgents.length;
+      document.getElementById('addAgentForm').reset();
+      closeAddAgentModal();
+    }
+
+    // ── Close modals on overlay click ──
+    document.getElementById('modalOverlay').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+    document.getElementById('addAgentOverlay').addEventListener('click', function(e) {
+      if (e.target === this) closeAddAgentModal();
+    });
+
+    // ── Initialization ──
+    document.addEventListener('DOMContentLoaded', () => {
+      appendLog('Enterprise AI Hub portal loaded', 'ok');
+      addActivity('Portal initialized', 'Enterprise AI Hub v1.0 · CrewAI Control Center');
+    });
+  </script>
+</body>
+</html>
