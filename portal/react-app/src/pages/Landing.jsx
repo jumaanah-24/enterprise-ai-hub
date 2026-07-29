@@ -42,7 +42,7 @@ export default function Landing() {
       <section className={styles.hero}>
         <div className={styles.heroCopy}>
           <div className={styles.eyebrow}>🤖 Multi-Agent AI Platform</div>
-          <h1>Your enterprise runs on <span className={styles.grad}>intelligent agents</span></h1>
+          <h1>Powering the modern enterprise<span className={styles.grad}> with autonomous AI - agents</span></h1>
           <p>Six autonomous AI agents working together — monitoring supply chains, budgets, vendors, risks, procurement, and delivering executive briefings in real time.</p>
           <div className={styles.heroActions}>
             <button className={styles.btnPrimary} onClick={() => navigate('/login')}>
