@@ -27,4 +27,20 @@ env/
 .DS_Store
 Thumbs.db
 
-/generated/prisma
+# Prisma generated
+/generated/
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Reports & uploads
+agent6-executive-briefing/reports/*.pdf
+agent6-executive-briefing/reports/*.xlsx
+agent6-executive-briefing/reports/*.txt
+
+# Prisma skills cache
+.claude/
+.windsurf/
+.agents/
+skills-lock.json
