@@ -20,14 +20,13 @@ export default function Login() {
     e.preventDefault()
     setError('')
     setLoading(true)
-    await new Promise(r => setTimeout(r, 400))
     if (tab === 'signin') {
-      const ok = login(email, password)
+      const ok = await login(email, password)
       setLoading(false)
       if (ok) navigate('/dashboard', { replace: true })
       else setError('Invalid email or password.')
     } else {
-      const res = register(email, password, name)
+      const res = await register(email, password, name)
       setLoading(false)
       if (res.ok) {
         setTab('signin')

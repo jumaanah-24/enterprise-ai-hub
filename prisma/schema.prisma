@@ -1,0 +1,178 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(100)
+  email     String   @unique @db.VarChar(150)
+  password  String   @db.VarChar(255)
+  role      String   @default("user") @db.VarChar(20)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("users")
+}
+
+model SupplyChain {
+  id                    Int     @id @default(autoincrement())
+  productType           String? @map("product_type") @db.VarChar(50)
+  sku                   String  @unique @db.VarChar(20)
+  price                 Float?
+  availability          Int?
+  productsSold          Int?    @map("products_sold")
+  revenueGenerated      Float?  @map("revenue_generated")
+  customerDemographics  String? @map("customer_demographics") @db.VarChar(50)
+  stockLevels           Int?    @map("stock_levels")
+  leadTimes             Int?    @map("lead_times")
+  orderQuantities       Int?    @map("order_quantities")
+  shippingTimes         Int?    @map("shipping_times")
+  shippingCarriers      String? @map("shipping_carriers") @db.VarChar(50)
+  shippingCosts         Float?  @map("shipping_costs")
+  supplierName          String? @map("supplier_name") @db.VarChar(50)
+  location              String? @db.VarChar(50)
+  leadTime              Int?    @map("lead_time")
+  productionVolumes     Int?    @map("production_volumes")
+  manufacturingLeadTime Int?    @map("manufacturing_lead_time")
+  manufacturingCosts    Float?  @map("manufacturing_costs")
+  inspectionResults     String? @map("inspection_results") @db.VarChar(20)
+  defectRates           Float?  @map("defect_rates")
+  transportationModes   String? @map("transportation_modes") @db.VarChar(30)
+  routes                String? @db.VarChar(20)
+  costs                 Float?
+
+  @@map("supply_chain")
+}
+
+model Budget {
+  id              Int     @id @default(autoincrement())
+  department      String  @unique @db.VarChar(100)
+  allocatedBudget Float   @map("allocated_budget")
+  spentBudget     Float   @map("spent_budget")
+  fiscalYear      Int     @map("fiscal_year")
+  category        String? @db.VarChar(50)
+
+  @@map("budgets")
+}
+
+model Procurement {
+  id         Int     @id @default(autoincrement())
+  purchaseId String  @unique @map("purchase_id") @db.VarChar(20)
+  department String? @db.VarChar(100)
+  vendor     String? @db.VarChar(100)
+  item       String? @db.VarChar(200)
+  amount     Float?
+  date       String? @db.VarChar(20)
+  status     String? @db.VarChar(20)
+  category   String? @db.VarChar(50)
+
+  @@map("procurement")
+}
+
+model Expense {
+  id         Int      @id @default(autoincrement())
+  department String?  @db.VarChar(100)
+  category   String?  @db.VarChar(50)
+  amount     Float?
+  approved   Boolean?
+  date       String?  @db.VarChar(20)
+
+  @@map("expenses")
+}
+
+model CloudCost {
+  id          Int    @id @default(autoincrement())
+  month       String @unique @db.VarChar(20)
+  totalCost   Float  @map("total_cost")
+  budgetLimit Float  @map("budget_limit")
+
+  @@map("cloud_costs")
+}
+
+model Contract {
+  id               Int      @id @default(autoincrement())
+  contractId       String   @unique @map("contract_id") @db.VarChar(20)
+  vendor           String?  @db.VarChar(100)
+  department       String?  @db.VarChar(100)
+  startDate        String?  @map("start_date") @db.VarChar(20)
+  endDate          String?  @map("end_date") @db.VarChar(20)
+  value            Float?
+  paymentTerms     String?  @map("payment_terms") @db.VarChar(50)
+  slaUptime        Float?   @map("sla_uptime")
+  slaResponseHours Int?     @map("sla_response_hours")
+  penaltyClause    String?  @map("penalty_clause") @db.VarChar(200)
+  status           String?  @db.VarChar(20)
+  category         String?  @db.VarChar(50)
+  autoRenew        Boolean? @map("auto_renew")
+
+  @@map("contracts")
+}
+
+model PipelineRun {
+  id          Int       @id @default(autoincrement())
+  runId       String    @unique @map("run_id") @db.VarChar(20)
+  incidentId  String?   @map("incident_id") @db.VarChar(50)
+  sku         String?   @db.VarChar(20)
+  requiredQty Int?      @map("required_qty")
+  status      String?   @db.VarChar(20)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  completedAt DateTime? @map("completed_at")
+
+  riskAssessments  RiskAssessment[]
+  purchaseOrders   PurchaseOrder[]
+  executiveReports ExecutiveReport[]
+
+  @@map("pipeline_runs")
+}
+
+model RiskAssessment {
+  id                  Int       @id @default(autoincrement())
+  runId               String    @map("run_id") @db.VarChar(20)
+  incidentId          String?   @map("incident_id") @db.VarChar(50)
+  sku                 String?   @db.VarChar(20)
+  overallRisk         String?   @map("overall_risk") @db.VarChar(20)
+  riskScore           Float?    @map("risk_score")
+  recommendedSupplier String?   @map("recommended_supplier") @db.VarChar(100)
+  estimatedCost       Float?    @map("estimated_cost")
+  expectedDelay       Int?      @map("expected_delay")
+  recommendation      String?
+  createdAt           DateTime  @default(now()) @map("created_at")
+
+  pipelineRun PipelineRun @relation(fields: [runId], references: [runId])
+
+  @@map("risk_assessments")
+}
+
+model PurchaseOrder {
+  id              Int      @id @default(autoincrement())
+  runId           String   @map("run_id") @db.VarChar(20)
+  incidentId      String?  @map("incident_id") @db.VarChar(50)
+  purchaseOrderId String?  @map("purchase_order_id") @db.VarChar(50)
+  supplier        String?  @db.VarChar(100)
+  estimatedCost   Float?   @map("estimated_cost")
+  approvalStatus  String?  @map("approval_status") @db.VarChar(30)
+  executionStatus String?  @map("execution_status") @db.VarChar(20)
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  pipelineRun PipelineRun @relation(fields: [runId], references: [runId])
+
+  @@map("purchase_orders")
+}
+
+model ExecutiveReport {
+  id               Int      @id @default(autoincrement())
+  runId            String   @map("run_id") @db.VarChar(20)
+  incidentId       String?  @map("incident_id") @db.VarChar(50)
+  executiveSummary String?  @map("executive_summary")
+  reportFile       String?  @map("report_file") @db.VarChar(200)
+  excelFile        String?  @map("excel_file") @db.VarChar(200)
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  pipelineRun PipelineRun @relation(fields: [runId], references: [runId])
+
+  @@map("executive_reports")
+}

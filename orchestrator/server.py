@@ -9,6 +9,7 @@ GET  /runs          → list all runs
 import asyncio, json, sys, uuid
 from pathlib import Path
 from datetime import datetime
+import importlib.util
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -21,10 +22,16 @@ _HERE = Path(__file__).resolve().parent
 _ROOT = _HERE.parent
 load_dotenv(_ROOT / "agent1-supply-chain" / ".env")
 
+sys.path.insert(0, str(_ROOT))  # expose root for database.py
 sys.path.insert(0, str(_HERE))  # so `import crew` resolves
-import importlib.util
 
 from crew import run_pipeline, Incident  # noqa: E402 — must be after sys.path
+from database import (
+    init_db, save_pipeline_run, update_pipeline_run,
+    save_risk_assessment, save_purchase_order, save_executive_report,
+)
+
+init_db()
 
 # Import Agent 4, 5, 6 directly from their folders
 def _import_from(path: Path, name: str):
@@ -73,6 +80,9 @@ async def _execute(run_id: str, req: IncidentRequest):
     _log(store, "Orchestrator", f"🚀 Pipeline started — Incident {req.incident_id}", "start")
     _log(store, "Orchestrator", f"SKU={req.sku}  Required Qty={req.required_quantity}", "info")
     _log(store, "Orchestrator", "Running 6-agent deterministic pipeline...", "info")
+
+    # Persist run start
+    save_pipeline_run(run_id, req.incident_id, req.sku, req.required_quantity)
 
     try:
         loop = asyncio.get_event_loop()
@@ -196,6 +206,12 @@ async def _execute(run_id: str, req: IncidentRequest):
             "agent6_executive_brief": a6_result,
         }
 
+        # Persist results to DB
+        save_risk_assessment(run_id, req.incident_id, req.sku, a4_result)
+        save_purchase_order(run_id, req.incident_id, a5_result)
+        save_executive_report(run_id, req.incident_id, a6_result)
+        update_pipeline_run(run_id, "completed")
+
     except Exception as e:
         import traceback
         tb = traceback.format_exc()
@@ -203,6 +219,7 @@ async def _execute(run_id: str, req: IncidentRequest):
         _log(store, "Orchestrator", tb[:600], "error")
         store["status"] = "failed"
         store["result"] = {"error": str(e), "traceback": tb}
+        update_pipeline_run(run_id, "failed")
 
 
 @app.post("/run-incident")
