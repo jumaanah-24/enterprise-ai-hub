@@ -21,6 +21,7 @@ _bt = _import_from(Path(__file__).resolve().parent / "tools" / "briefing_tools.p
 generate_executive_summary    = _bt.generate_executive_summary
 generate_incident_timeline    = _bt.generate_incident_timeline
 generate_pdf_report           = _bt.generate_pdf_report
+generate_excel_report         = _bt.generate_excel_report
 prepare_dashboard_summary     = _bt.prepare_dashboard_summary
 prepare_slack_notification    = _bt.prepare_slack_notification
 prepare_whatsapp_notification = _bt.prepare_whatsapp_notification
@@ -52,6 +53,11 @@ def run_briefing(inp: BriefingInput) -> dict:
         inp.purchase_order_id, inp.supplier, inp.estimated_cost,
         inp.approval_status, inp.execution_status, timeline,
     )
+    excel_result = generate_excel_report(
+        inp.incident_id, summary_result["executive_summary"],
+        inp.purchase_order_id, inp.supplier, inp.estimated_cost,
+        inp.approval_status, inp.execution_status, timeline,
+    )
     slack_payload = prepare_slack_notification(
         inp.incident_id, inp.purchase_order_id, inp.supplier,
         inp.estimated_cost, inp.execution_status,
@@ -69,6 +75,7 @@ def run_briefing(inp: BriefingInput) -> dict:
         "incident_id":       inp.incident_id,
         "executive_summary": summary_result["executive_summary"],
         "report_file":       pdf_result["report_file"],
+        "excel_file":        excel_result["excel_file"],
         "dashboard_status":  "UPDATED",
         "slack_payload":     slack_payload,
         "whatsapp_payload":  wa_payload,

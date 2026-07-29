@@ -61,8 +61,45 @@ const SEV_COLORS     = { Critical: styles.badgeRed, High: styles.badgeOrange, Me
 
 export default function BriefingDashboard({ onClose }) {
   const [downloaded, setDownloaded] = useState({})
+  const [shareMsg, setShareMsg] = useState('')
 
-  function handleDownload(type) {
+  async function handleDownload(type) {
+    if (type === 'pdf') {
+      try {
+        const res = await fetch('http://localhost:8003/latest-report')
+        const { filename } = await res.json()
+        if (!filename) { alert('No PDF report yet. Run the pipeline first.'); return }
+        const a = document.createElement('a')
+        a.href = `http://localhost:8003/report/${filename}`
+        a.download = filename
+        a.click()
+      } catch { alert('Could not connect to orchestrator.'); return }
+    }
+
+    if (type === 'excel') {
+      try {
+        const res = await fetch('http://localhost:8003/latest-excel')
+        const { filename } = await res.json()
+        if (!filename) { alert('No Excel report yet. Run the pipeline first.'); return }
+        const a = document.createElement('a')
+        a.href = `http://localhost:8003/excel/${filename}`
+        a.download = filename
+        a.click()
+      } catch { alert('Could not connect to orchestrator.'); return }
+    }
+
+    if (type === 'share') {
+      const url = `${window.location.origin}/?view=briefing`
+      try {
+        await navigator.clipboard.writeText(url)
+        setShareMsg('🔗 Link copied to clipboard!')
+      } catch {
+        setShareMsg(`🔗 Share: ${url}`)
+      }
+      setTimeout(() => setShareMsg(''), 3000)
+      return
+    }
+
     setDownloaded(prev => ({ ...prev, [type]: true }))
     setTimeout(() => setDownloaded(prev => ({ ...prev, [type]: false })), 2000)
   }
@@ -172,6 +209,7 @@ export default function BriefingDashboard({ onClose }) {
                     </button>
                   ))}
                 </div>
+                {shareMsg && <div className={styles.shareMsg}>{shareMsg}</div>}
               </div>
 
               {/* Notifications Sent */}

@@ -1,10 +1,10 @@
 EXECUTIVE REPORT
 Incident: INC001
 
-Incident INC001 has been successfully completed. A purchase order (PO-1001) was issued to Supplier 1 for an estimated value of $6,699. Approval status: APPROVED. The procurement workflow executed with status: SUCCESS.
+Incident INC001 has been encountered issues. A purchase order () was issued to Supplier 1 for an estimated value of $513. Approval status: REJECTED. The procurement workflow executed with status: FAILED.
 
-PO: PO-1001
+PO: 
 Supplier: Supplier 1
-Cost: $6,699
-Approval: APPROVED
-Status: SUCCESS
+Cost: $513
+Approval: REJECTED
+Status: FAILED

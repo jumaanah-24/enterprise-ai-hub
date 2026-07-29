@@ -12,7 +12,7 @@ from datetime import datetime
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, FileResponse
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
@@ -261,3 +261,43 @@ async def list_runs():
 @app.get("/health")
 def health():
     return {"status": "ok", "service": "orchestrator", "port": 8003}
+
+
+_REPORTS_DIR = _ROOT / "agent6-executive-briefing" / "reports"
+
+
+@app.get("/latest-report")
+def latest_report():
+    files = sorted(_REPORTS_DIR.glob("executive_report_*.pdf"), key=lambda f: f.stat().st_mtime, reverse=True)
+    if not files:
+        return {"filename": None}
+    return {"filename": files[0].name}
+
+
+@app.get("/report/{filename}")
+def download_report(filename: str):
+    filepath = _REPORTS_DIR / filename
+    if not filepath.exists() or not filepath.is_file():
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Report not found")
+    media_type = "application/pdf" if filename.endswith(".pdf") else "text/plain"
+    return FileResponse(str(filepath), media_type=media_type, filename=filename)
+
+
+@app.get("/latest-excel")
+def latest_excel():
+    files = sorted(_REPORTS_DIR.glob("executive_report_*.xlsx"), key=lambda f: f.stat().st_mtime, reverse=True)
+    if not files:
+        return {"filename": None}
+    return {"filename": files[0].name}
+
+
+@app.get("/excel/{filename}")
+def download_excel(filename: str):
+    filepath = _REPORTS_DIR / filename
+    if not filepath.exists() or not filepath.is_file():
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Excel report not found")
+    return FileResponse(str(filepath),
+                        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        filename=filename)
