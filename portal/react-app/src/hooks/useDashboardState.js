@@ -21,8 +21,8 @@ const initialCards = () => ({
 })
 
 export function useDashboardState(user) {
-  const userId  = user?.id   || null
-  const isDemo  = userId === 0   // demo accounts have no DB row
+  const userId = user?.id ?? null
+  const isDemo = !userId || userId === 0
 
   const [incidents, setIncidents] = useState([])
   const [activities, setActivities] = useState([
@@ -43,14 +43,12 @@ export function useDashboardState(user) {
 
   // Fetch incidents from DB when user logs in
   useEffect(() => {
-    if (!userId || isDemo) { setIncidents([]); return }
+    if (isDemo || !userId) { setIncidents([]); return }
     fetch(`${API}/incidents?userId=${userId}`)
-      .then(r => r.json())
-      .then(data => {
-        if (data.incidents) setIncidents(data.incidents)
-      })
-      .catch(() => {})
-  }, [userId])
+      .then(r => { if (!r.ok) throw new Error(r.status); return r.json() })
+      .then(data => { if (Array.isArray(data.incidents)) setIncidents(data.incidents) })
+      .catch(err => console.error('Failed to load incidents:', err))
+  }, [userId, isDemo])
 
   const addIncident = useCallback((type, title, detail) => {
     const now  = new Date()

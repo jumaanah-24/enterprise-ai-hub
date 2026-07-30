@@ -10,11 +10,12 @@ function PrivateRoute({ children }) {
 }
 
 function AppRoutes() {
+  const { user } = useAuth()
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/dashboard/*" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+      <Route path="/dashboard/*" element={<PrivateRoute><Dashboard key={user?.id} /></PrivateRoute>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
