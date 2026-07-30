@@ -8,10 +8,12 @@ import PipelineModal from '../components/PipelineModal'
 import AddAgentModal from '../components/AddAgentModal'
 import Toast from '../components/Toast'
 import { useDashboardState } from '../hooks/useDashboardState'
+import { useAuth } from '../hooks/useAuth'
 import styles from './Dashboard.module.css'
 
 export default function Dashboard() {
-  const state = useDashboardState()
+  const { user } = useAuth()
+  const state = useDashboardState(user)
   const [showPipeline, setShowPipeline] = useState(false)
   const [showAddAgent, setShowAddAgent] = useState(false)
   const [toasts, setToasts] = useState([])

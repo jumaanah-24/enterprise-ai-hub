@@ -1,4 +1,6 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
+
+const API = 'http://localhost:8080'
 
 const initialMetrics = () => ({
   supply:      { tasks: 0, success: 0, time: 0, load: 0 },
@@ -18,26 +20,53 @@ const initialCards = () => ({
   briefing:    { report: '—', dashboard: '—', slack: '—', wa: '—', lastRun: '—' },
 })
 
-export function useDashboardState() {
+export function useDashboardState(user) {
+  const userId  = user?.id   || null
+  const isDemo  = userId === 0   // demo accounts have no DB row
+
   const [incidents, setIncidents] = useState([])
-  const [activities, setActivities] = useState([{ title: 'Portal initialized', detail: 'Enterprise AI Hub v1.0 · CrewAI Control Center', time: 'now' }])
+  const [activities, setActivities] = useState([
+    { title: 'Portal initialized', detail: 'Enterprise AI Hub v1.0 · Control Center', time: 'now' }
+  ])
   const [pipelineRunning, setPipelineRunning] = useState(false)
   const [pipelineRuns, setPipelineRuns] = useState(0)
   const [pipelineSteps, setPipelineSteps] = useState(['pending','pending','pending','pending','pending','pending'])
   const [pipelineStatus, setPipelineStatus] = useState('Idle')
   const [consoleLogs, setConsoleLogs] = useState([
-    { time: 'init', msg: 'CrewAI orchestrator loaded', level: 'info' },
-    { time: 'init', msg: '6 agents registered in crew', level: 'info' },
+    { time: 'init', msg: 'Orchestrator loaded', level: 'info' },
+    { time: 'init', msg: '6 agents registered', level: 'info' },
     { time: 'ready', msg: 'Pipeline ready — click "Run Pipeline"', level: 'ok' },
   ])
   const [metrics, setMetrics] = useState(initialMetrics)
   const [cards, setCards] = useState(initialCards)
   const [customAgents, setCustomAgents] = useState([])
 
+  // Fetch incidents from DB when user logs in
+  useEffect(() => {
+    if (!userId || isDemo) { setIncidents([]); return }
+    fetch(`${API}/incidents?userId=${userId}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.incidents) setIncidents(data.incidents)
+      })
+      .catch(() => {})
+  }, [userId])
+
   const addIncident = useCallback((type, title, detail) => {
-    const time = new Date().toLocaleTimeString()
-    setIncidents(prev => [{ type, title, detail, time }, ...prev])
-  }, [])
+    const now  = new Date()
+    const time = now.toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12: true })
+    const inc  = { type, title, detail, time }
+    setIncidents(prev => [inc, ...prev])
+
+    // Persist to DB (skip demo users who have no DB row)
+    if (userId && !isDemo) {
+      fetch(`${API}/incidents`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, type, title, detail, time }),
+      }).catch(() => {})
+    }
+  }, [userId, isDemo])
 
   const addActivity = useCallback((title, detail) => {
     const time = new Date().toLocaleTimeString()
@@ -53,10 +82,10 @@ export function useDashboardState() {
     setMetrics(prev => ({
       ...prev,
       [key]: {
-        tasks: prev[key].tasks + 1,
+        tasks:   prev[key].tasks + 1,
         success: prev[key].success + 1,
-        time: Math.floor(Math.random() * 600 + 100),
-        load: Math.min(100, prev[key].load + 20),
+        time:    Math.floor(Math.random() * 600 + 100),
+        load:    Math.min(100, prev[key].load + 20),
       }
     }))
   }, [])
@@ -71,7 +100,8 @@ export function useDashboardState() {
 
   return {
     incidents, activities, pipelineRunning, setPipelineRunning,
-    pipelineRuns, setPipelineRuns, pipelineSteps, setPipelineSteps,
+    pipelineRuns, setPipelineRuns,
+    pipelineSteps, setPipelineSteps,
     pipelineStatus, setPipelineStatus, consoleLogs, metrics, cards,
     customAgents, addIncident, addActivity, appendLog, updateMetric, updateCard, addCustomAgent,
   }

@@ -15,7 +15,24 @@ model User {
   role      String   @default("user") @db.VarChar(20)
   createdAt DateTime @default(now()) @map("created_at")
 
+  incidents    Incident[]
+  pipelineRuns PipelineRun[]
+
   @@map("users")
+}
+
+model Incident {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  type      String   @db.VarChar(20)
+  title     String   @db.VarChar(200)
+  detail    String?
+  time      String   @db.VarChar(30)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("incidents")
 }
 
 model SupplyChain {
@@ -115,6 +132,7 @@ model Contract {
 model PipelineRun {
   id          Int       @id @default(autoincrement())
   runId       String    @unique @map("run_id") @db.VarChar(20)
+  userId      Int?      @map("user_id")
   incidentId  String?   @map("incident_id") @db.VarChar(50)
   sku         String?   @db.VarChar(20)
   requiredQty Int?      @map("required_qty")
@@ -122,6 +140,7 @@ model PipelineRun {
   createdAt   DateTime  @default(now()) @map("created_at")
   completedAt DateTime? @map("completed_at")
 
+  user             User?            @relation(fields: [userId], references: [id])
   riskAssessments  RiskAssessment[]
   purchaseOrders   PurchaseOrder[]
   executiveReports ExecutiveReport[]

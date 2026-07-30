@@ -70,5 +70,45 @@ app.post('/auth/login', async (req, res) => {
 // ── Health ────────────────────────────────────────────────
 app.get('/health', (_, res) => res.json({ status: 'ok', service: 'auth-server' }))
 
+// ── Incidents ─────────────────────────────────────────────
+// GET /incidents?userId=1  → fetch all incidents for a user
+app.get('/incidents', async (req, res) => {
+  const userId = parseInt(req.query.userId)
+  if (!userId) return res.status(400).json({ detail: 'userId required.' })
+  try {
+    const rows = await prisma.incident.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+    })
+    const incidents = rows.map(r => ({
+      ...r,
+      time: new Date(r.createdAt).toLocaleString('en-US', {
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        day: '2-digit', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true,
+      }),
+    }))
+    return res.json({ incidents })
+  } catch (err) {
+    console.error('Incidents fetch error:', err.message)
+    return res.status(500).json({ detail: 'Server error.' })
+  }
+})
+
+// POST /incidents  → save a new incident
+app.post('/incidents', async (req, res) => {
+  const { userId, type, title, detail, time } = req.body
+  if (!userId || !type || !title) return res.status(400).json({ detail: 'userId, type, title required.' })
+  try {
+    const incident = await prisma.incident.create({
+      data: { userId: parseInt(userId), type, title, detail: detail || null, time: time || new Date().toLocaleTimeString() },
+    })
+    return res.status(201).json({ incident })
+  } catch (err) {
+    console.error('Incident save error:', err.message)
+    return res.status(500).json({ detail: 'Server error.' })
+  }
+})
+
 const PORT = 8080
 app.listen(PORT, () => console.log(`Auth server running on http://localhost:${PORT}`))

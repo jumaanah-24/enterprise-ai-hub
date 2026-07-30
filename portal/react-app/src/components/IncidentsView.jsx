@@ -2,6 +2,16 @@ import styles from './IncidentsView.module.css'
 
 const icons = { error: '✕', warn: '⚠', info: 'ℹ', success: '✓' }
 
+function formatTime(inc) {
+  if (inc.createdAt) {
+    return new Date(inc.createdAt).toLocaleString('en-US', {
+      day: '2-digit', month: 'short', year: 'numeric',
+      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true,
+    })
+  }
+  return inc.time
+}
+
 export default function IncidentsView({ incidents }) {
   return (
     <div>
@@ -19,7 +29,7 @@ export default function IncidentsView({ incidents }) {
                     <strong>{inc.title}</strong>
                     {inc.detail && <div className={styles.detail}>{inc.detail}</div>}
                   </div>
-                  <span className={styles.time}>{inc.time}</span>
+                  <span className={styles.time}>{formatTime(inc)}</span>
                 </li>
               ))}
             </ul>
