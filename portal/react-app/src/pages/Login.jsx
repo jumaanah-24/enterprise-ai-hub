@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import styles from './Login.module.css'
@@ -14,7 +14,7 @@ export default function Login() {
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
 
-  if (user) { navigate('/dashboard', { replace: true }); return null }
+  useEffect(() => { if (user) navigate('/dashboard', { replace: true }) }, [user])
 
   async function handleSubmit(e) {
     e.preventDefault()
